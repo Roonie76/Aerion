@@ -9,24 +9,50 @@ export default function About() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const sections = gsap.utils.toArray('.about-section');
-      sections.forEach((section) => {
-        gsap.fromTo(
-          section,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.2,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: section,
-              start: 'top 85%',
-              toggleActions: 'play none none none',
-            },
-          }
-        );
-      });
+      // Block 1 (fade up)
+      gsap.fromTo('.block-1',
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1, y: 0, duration: 1.2, ease: 'power3.out',
+          scrollTrigger: { trigger: '.block-1', start: 'top 85%' }
+        }
+      );
+
+      // Block 2 (left slide)
+      gsap.fromTo('.block-2',
+        { opacity: 0, x: -60 },
+        {
+          opacity: 1, x: 0, duration: 1.2, ease: 'power3.out',
+          scrollTrigger: { trigger: '.block-2', start: 'top 85%' }
+        }
+      );
+
+      // Block 3 (right slide)
+      gsap.fromTo('.block-3',
+        { opacity: 0, x: 60 },
+        {
+          opacity: 1, x: 0, duration: 1.2, ease: 'power3.out',
+          scrollTrigger: { trigger: '.block-3', start: 'top 85%' }
+        }
+      );
+
+      // Block 4 (scale)
+      gsap.fromTo('.block-4',
+        { opacity: 0, scale: 0.95 },
+        {
+          opacity: 1, scale: 1, duration: 1.2, ease: 'power3.out',
+          scrollTrigger: { trigger: '.block-4', start: 'top 85%' }
+        }
+      );
+
+      // Block 5 (soft fade)
+      gsap.fromTo('.block-5',
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1, y: 0, duration: 1.2, ease: 'power3.out',
+          scrollTrigger: { trigger: '.block-5', start: 'top 90%' }
+        }
+      );
     }, containerRef);
 
     return () => ctx.revert();
@@ -35,37 +61,35 @@ export default function About() {
   return (
     <div ref={containerRef} className="bg-[#0e1018] text-white overflow-hidden">
       {/* Block 1 — BRAND ESSENCE (Centered) */}
-      <section className="about-section lu-section min-h-[85vh] flex flex-col items-center justify-center text-center px-4">
+      <section className="block-1 lu-section min-h-[85vh] flex flex-col items-center justify-center text-center px-4">
         <p className="lu-overline mb-8 text-xs tracking-[0.3em] uppercase opacity-70">The Standard</p>
-        <h1 className="lu-section-title text-[clamp(2.5rem,6vw,6rem)] font-black leading-[1] tracking-tighter max-w-5xl mb-16">
+        <h1 className="lu-section-title text-[clamp(2.5rem,6vw,6rem)] font-black leading-[1] tracking-tighter max-w-5xl mb-16 glow">
           THE AERION STANDARD
         </h1>
-        
+
         <div className="text-lg md:text-xl font-light text-[#ececf1] space-y-10 leading-relaxed max-w-2xl mx-auto tracking-wide">
           <p>
             Aerion exists to remove uncertainty from the game.
           </p>
           <p>
-            Every product is engineered for consistent flight,<br className="hidden md:block"/>
+            Every product is engineered for consistent flight,<br className="hidden md:block" />
             controlled speed, and precise response.
           </p>
           <p>
-            Because at the highest level,<br className="hidden md:block"/>
+            Because at the highest level,<br className="hidden md:block" />
             even the smallest inconsistency matters.
           </p>
         </div>
       </section>
 
-      <div className="lu-container px-4 flex justify-center py-20">
-        <div className="w-[1px] h-32 bg-gradient-to-b from-primary/0 via-primary/40 to-primary/0"></div>
-      </div>
+      <Divider />
 
       {/* Block 2 — ENGINEERING (Left Aligned) */}
-      <section className="about-section lu-section py-40">
+      <section className="block-2 lu-section py-40">
         <div className="lu-container px-4 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
           <div className="text-left w-full md:col-span-6 md:col-start-1 lg:col-span-5 lg:col-start-2">
             <p className="lu-overline mb-8 text-primary tracking-[0.2em] text-xs uppercase">Precision</p>
-            <h2 className="text-4xl md:text-5xl font-black mb-10 tracking-tighter leading-[1.1]">
+            <h2 className="text-4xl md:text-5xl font-black mb-10 tracking-tighter leading-[1.1] glow">
               ENGINEERED <br /> WITH INTENT
             </h2>
             <p className="text-[#a0a0a5] text-lg leading-loose mb-10">
@@ -82,19 +106,17 @@ export default function About() {
         </div>
       </section>
 
-      <div className="lu-container px-4 flex justify-center py-20">
-        <div className="w-[1px] h-32 bg-gradient-to-b from-primary/0 via-primary/40 to-primary/0"></div>
-      </div>
+      <Divider />
 
       {/* Block 3 — TESTING (Right Aligned) */}
-      <section className="about-section lu-section py-40">
+      <section className="block-3 lu-section py-40">
         <div className="lu-container px-4 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
           <div className="hidden md:block md:col-span-6 lg:col-span-6">
-             {/* Massive empty space acting as a structural pause */}
+            {/* Massive empty space acting as a structural pause */}
           </div>
           <div className="text-left md:col-span-6 lg:col-span-5 lg:col-start-7">
             <p className="lu-overline mb-8 text-primary tracking-[0.2em] text-xs uppercase">Verification</p>
-            <h2 className="text-4xl md:text-5xl font-black mb-10 tracking-tighter leading-[1.1]">
+            <h2 className="text-4xl md:text-5xl font-black mb-10 tracking-tighter leading-[1.1] glow">
               TESTED FOR <br /> PERFORMANCE
             </h2>
             <p className="text-[#a0a0a5] text-lg leading-loose mb-10">
@@ -108,14 +130,12 @@ export default function About() {
         </div>
       </section>
 
-      <div className="lu-container px-4 flex justify-center py-20">
-        <div className="w-[1px] h-32 bg-gradient-to-b from-primary/0 via-primary/40 to-primary/0"></div>
-      </div>
+      <Divider />
 
       {/* Block 4 — PLAYER FOCUS (Centered Large Text) */}
-      <section className="about-section lu-section py-48 flex flex-col items-center justify-center text-center px-4 bg-gradient-to-b from-transparent to-[#c9a84c05]">
+      <section className="block-4 lu-section py-48 flex flex-col items-center justify-center text-center px-4 bg-gradient-to-b from-transparent to-[#c9a84c05]">
         <div className="max-w-5xl">
-          <h2 className="text-[clamp(3rem,7vw,7rem)] font-black tracking-tightest mb-12 text-white uppercase italic leading-[0.9]">
+          <h2 className="text-[clamp(3rem,7vw,7rem)] font-black tracking-tightest mb-12 text-white uppercase italic leading-[0.9] glow">
             BUILT FOR THOSE <br /> WHO NOTICE
           </h2>
           <p className="text-xl md:text-2xl text-[#f0f0f0] font-light leading-relaxed max-w-prose mx-auto opacity-80">
@@ -126,10 +146,12 @@ export default function About() {
         </div>
       </section>
 
+      <Divider />
+
       {/* Block 5 — BRAND PHILOSOPHY (Minimal Closing) */}
-      <section className="about-section lu-section py-32 flex flex-col items-center justify-center text-center px-4">
-        <p className="lu-overline mb-8 opacity-40 tracking-[0.3em] uppercase text-xs">Persistence</p>
-        <h2 className="text-3xl md:text-4xl font-black mb-8 tracking-widest text-primary">PRECISION IN MOTION</h2>
+      <section className="block-5 lu-section py-32 flex flex-col items-center justify-center text-center px-4">
+        <p className="lu-overline mb-8 opacity-40 tracking-[0.3em] uppercase text-xs">Philosophy</p>
+        <h2 className="text-3xl md:text-4xl font-black mb-8 tracking-widest text-primary glow">PRECISION IN MOTION</h2>
         <div className="max-w-lg space-y-3 opacity-60 text-sm tracking-[0.15em] leading-loose">
           <p>No excess. No compromise.</p>
           <p>Only refinement where it matters.</p>
@@ -137,10 +159,20 @@ export default function About() {
         </div>
       </section>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .tracking-tightest { letter-spacing: -0.05em; }
         .tracking-loose { letter-spacing: 0.2em; }
+        .glow { text-shadow: 0 0 25px rgba(201,168,76,0.12); }
       ` }} />
+    </div>
+  );
+}
+
+function Divider() {
+  return (
+    <div className="lu-container px-4 flex justify-center py-20">
+      <div className="w-[1px] h-32 bg-gradient-to-b from-primary/0 via-primary/40 to-primary/0"></div>
     </div>
   );
 }

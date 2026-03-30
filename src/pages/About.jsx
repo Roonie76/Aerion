@@ -68,22 +68,18 @@ export default function About() {
         scrollTrigger: { trigger: '.line-reveal', start: 'top 85%' },
       });
 
-      // Section fade-ups
+      // Section fades
       gsap.utils.toArray('.fade-up').forEach((el) => {
-        gsap.fromTo(el, { opacity: 0, y: 40 }, {
+        gsap.fromTo(el, { opacity: 0, y: 50 }, {
           opacity: 1, y: 0, duration: 1.1, ease: 'power3.out',
           scrollTrigger: { trigger: el, start: 'top 85%' },
         });
       });
 
-      // Directional slides for zig-zag blocks
-      gsap.fromTo('.slide-left', { opacity: 0, x: -50 }, {
-        opacity: 1, x: 0, duration: 1.2, ease: 'power3.out',
-        scrollTrigger: { trigger: '.slide-left', start: 'top 85%' },
-      });
-      gsap.fromTo('.slide-right', { opacity: 0, x: 50 }, {
-        opacity: 1, x: 0, duration: 1.2, ease: 'power3.out',
-        scrollTrigger: { trigger: '.slide-right', start: 'top 85%' },
+      // Pillars stagger
+      gsap.fromTo('.pillar-card', { opacity: 0, y: 40 }, {
+        opacity: 1, y: 0, duration: 0.9, stagger: 0.18, ease: 'power3.out',
+        scrollTrigger: { trigger: '.pillars-section', start: 'top 80%' },
       });
 
       // Closing quote word-by-word
@@ -398,7 +394,7 @@ export default function About() {
           </div>
 
           {/* Text */}
-          <div className="slide-right">
+          <div className="fade-up">
             <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-8" style={{ color: 'var(--gold)' }}>Verification</p>
             <h2 className="font-display font-black uppercase leading-none mb-10" style={{ fontSize: 'clamp(2.8rem,5.5vw,5.5rem)', letterSpacing: '-0.03em', color: 'var(--cream)' }}>
               Tested For<br /><em style={{ fontStyle: 'italic', WebkitTextStroke: '1px rgba(201,168,76,0.6)', color: 'transparent', fontFamily: 'Cormorant Garamond' }}>Performance</em>
@@ -414,115 +410,40 @@ export default function About() {
         </div>
       </section>
 
-      <Divider />
+      {/* ─── Divider ──────────────────────────────────────────────────────── */}
+      <div className="relative z-10 px-6 py-4 max-w-5xl mx-auto">
+        <div className="line-reveal divider-line" />
+      </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          PILLAR 01 — SELECTION (LEFT)
+          PILLARS
       ═══════════════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 py-40 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
-          {/* Text */}
-          <div className="slide-left">
-            <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-8" style={{ color: 'var(--gold)' }}>Process · 01</p>
-            <h2 className="font-display font-black uppercase leading-none mb-10" style={{ fontSize: 'clamp(2.5rem,5vw,5rem)', letterSpacing: '-0.03em', color: 'var(--cream)' }}>
-              Selection<br /><em style={{ fontStyle: 'italic', WebkitTextStroke: '1px rgba(201,168,76,0.5)', color: 'transparent', fontFamily: 'Cormorant Garamond' }}>Symmetry</em>
+      <section className="pillars-section relative z-10 py-40 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="fade-up text-center mb-20">
+            <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-6" style={{ color: 'var(--gold)' }}>Process</p>
+            <h2 className="font-display font-black uppercase leading-none" style={{ fontSize: 'clamp(2.5rem,5vw,5rem)', letterSpacing: '-0.03em', color: 'var(--cream)' }}>
+              How We Build
             </h2>
-            <p className="text-lg leading-relaxed mb-10" style={{ color: 'rgba(240,237,232,0.45)', fontFamily: 'Cormorant Garamond', fontWeight: 300 }}>
-              Only feathers from the left wing of select waterfowl are used.
-              Symmetry is non-negotiable at this level; even a micron of deviation in curvature can compromise flight predictability.
-            </p>
-            <div className="text-xs tracking-[0.2em] uppercase gold opacity-60 font-display">Criterion: 100% Curvature Match</div>
           </div>
 
-          {/* Visual: Selection Symmetry Grid */}
-          <div className="fade-up hidden md:flex items-center justify-center opacity-40">
-            <svg viewBox="0 0 200 200" width="200" height="200">
-               <defs>
-                 <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                   <stop offset="0%" stopColor="var(--gold)" stopOpacity="0.1" />
-                   <stop offset="100%" stopColor="var(--gold)" stopOpacity="0.4" />
-                 </linearGradient>
-               </defs>
-               <rect x="10" y="10" width="180" height="180" fill="none" stroke="url(#goldGrad)" strokeWidth="0.5" />
-               <line x1="100" y1="10" x2="100" y2="190" stroke="var(--gold)" strokeWidth="0.5" strokeDasharray="4 4" />
-               <path d="M60,40 Q100,20 140,40" fill="none" stroke="var(--gold)" strokeWidth="1" opacity="0.6" />
-               <path d="M60,100 Q100,80 140,100" fill="none" stroke="var(--gold)" strokeWidth="1" opacity="0.6" />
-               <path d="M60,160 Q100,140 140,160" fill="none" stroke="var(--gold)" strokeWidth="1" opacity="0.6" />
-            </svg>
-          </div>
-        </div>
-      </section>
-
-      <Divider />
-
-      {/* ═══════════════════════════════════════════════════════════════════
-          PILLAR 02 — CALIBRATION (RIGHT)
-      ═══════════════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 py-40 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
-          {/* Visual: Calibration Dial */}
-          <div className="fade-up hidden md:flex items-center justify-center order-2 md:order-1 opacity-40">
-            <div className="relative" style={{ width: 200, height: 200 }}>
-              <div className="absolute inset-0 rounded-full border border-gold/20" />
-              <div className="absolute inset-4 rounded-full border border-gold/10 border-dashed" />
-              <div className="absolute top-1/2 left-1/2 w-32 h-[1px] bg-gold/60 origin-left -translate-y-1/2" style={{ animation: 'spincw 4s ease-in-out infinite alternate' }} />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-gold/40 rounded-full blur-sm" />
-            </div>
-          </div>
-
-          {/* Text */}
-          <div className="slide-right order-1 md:order-2">
-            <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-8" style={{ color: 'var(--gold)' }}>Process · 02</p>
-            <h2 className="font-display font-black uppercase leading-none mb-10" style={{ fontSize: 'clamp(2.5rem,5vw,5rem)', letterSpacing: '-0.03em', color: 'var(--cream)' }}>
-              Calibration<br /><em style={{ fontStyle: 'italic', WebkitTextStroke: '1px rgba(201,168,76,0.5)', color: 'transparent', fontFamily: 'Cormorant Garamond' }}>Density</em>
-            </h2>
-            <p className="text-lg leading-relaxed mb-10" style={{ color: 'rgba(240,237,232,0.45)', fontFamily: 'Cormorant Garamond', fontWeight: 300 }}>
-              Cork density is measured per batch. Every base undergoes tensile testing before assembly begins.
-              This ensures that the center of gravity remains identical across every unit we produce.
-            </p>
-            <div className="text-xs tracking-[0.2em] uppercase gold opacity-60 font-display">Metric: Batch Identity Verified</div>
-          </div>
-        </div>
-      </section>
-
-      <Divider />
-
-      {/* ═══════════════════════════════════════════════════════════════════
-          PILLAR 03 — VERIFICATION (LEFT)
-      ═══════════════════════════════════════════════════════════════════ */}
-      <section className="relative z-10 py-40 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
-          {/* Text */}
-          <div className="slide-left">
-            <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-8" style={{ color: 'var(--gold)' }}>Process · 03</p>
-            <h2 className="font-display font-black uppercase leading-none mb-10" style={{ fontSize: 'clamp(2.5rem,5vw,5rem)', letterSpacing: '-0.03em', color: 'var(--cream)' }}>
-              Verification<br /><em style={{ fontStyle: 'italic', WebkitTextStroke: '1px rgba(201,168,76,0.5)', color: 'transparent', fontFamily: 'Cormorant Garamond' }}>Outliers</em>
-            </h2>
-            <p className="text-lg leading-relaxed mb-10" style={{ color: 'rgba(240,237,232,0.45)', fontFamily: 'Cormorant Garamond', fontWeight: 300 }}>
-              Finished shuttles are machine-launched and tracked at 120 fps.
-              Aerion products that deviate from our perfect flight parabola are discarded, not adjusted.
-              We do not fix errors; we eliminate them.
-            </p>
-            <div className="text-xs tracking-[0.2em] uppercase gold opacity-60 font-display">Standard: zero variance tolerance</div>
-          </div>
-
-          {/* Visual: Tracking Lens */}
-          <div className="fade-up hidden md:flex items-center justify-center opacity-40">
-            <div className="relative" style={{ width: 180, height: 180 }}>
-              <div className="absolute inset-0 border border-gold/20 flex items-center justify-center">
-                 <div className="w-1 h-1 bg-gold rounded-full" />
-                 <div className="absolute inset-6 border border-gold/30 rounded-full" />
-                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-4 bg-gold/80" />
-                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1px] h-4 bg-gold/80" />
-                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-[1px] bg-gold/80" />
-                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-[1px] bg-gold/80" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {PILLARS.map((p) => (
+              <div key={p.num} className="pillar-card p-10 rounded-sm">
+                <p className="font-display font-black mb-6" style={{ fontSize: '3.5rem', lineHeight: 1, color: 'rgba(201,168,76,0.15)', letterSpacing: '-0.04em' }}>
+                  {p.num}
+                </p>
+                <h3 className="font-display font-bold uppercase tracking-wider text-lg mb-4" style={{ color: 'var(--cream)', letterSpacing: '0.12em' }}>
+                  {p.title}
+                </h3>
+                <p className="text-base leading-relaxed" style={{ fontFamily: 'Cormorant Garamond', fontWeight: 300, color: 'rgba(240,237,232,0.45)' }}>
+                  {p.body}
+                </p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
-
-      <Divider />
 
       {/* ═══════════════════════════════════════════════════════════════════
           BUILT FOR THOSE WHO NOTICE

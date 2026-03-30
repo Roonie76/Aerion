@@ -1,22 +1,13 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Button from '../components/Button';
-import PageWrapper from '../components/PageWrapper';
-import SectionHeading from '../components/SectionHeading';
+import React, { useMemo, useState, useEffect, memo, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart, useAuth } from '../context';
+import { useRazorpay } from '../hooks/useRazorpay';
 
 const TAX_RATE = 0.12;
 
-export default function Cart() {
-  const navigate = useNavigate();
-  const { cartItems, addItem, removeItem, deleteItem, clearCart } = useCart();
-  const { user } = useAuth();
-  
-  const [isPlaced, setIsPlaced] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  
-  const [checkoutData, setCheckoutData] = useState({
+/* ─── Memoized Checkout Form ─────────────────────────────── */
+const CheckoutForm = memo(function CheckoutForm({ user, loading, error, onSubmit }) {
+  const [data, setData] = useState({
     fullName: user?.name || '',
     email: user?.email || '',
     phone: '',
@@ -26,107 +17,91 @@ export default function Cart() {
 
   useEffect(() => {
     if (user) {
-      setCheckoutData(prev => ({
-        ...prev,
-        fullName: user.name,
-        email: user.email
-      }));
+      setData((prev) => ({ ...prev, fullName: user.name, email: user.email }));
     }
   }, [user]);
 
-  const { subtotal, taxes, totalItems, grandTotal } = useMemo(() => {
-    const computedSubtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const computedItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    const computedTaxes = Math.round(computedSubtotal * TAX_RATE);
+  const onChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setData((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
-    return {
-      subtotal: computedSubtotal,
-      taxes: computedTaxes,
-      totalItems: computedItems,
-      grandTotal: computedSubtotal + computedTaxes,
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(data);
+  };
+
+  return (
+    <form className="lu-form" onSubmit={handleSubmit}>
+      {error && <div className="lu-form-error" role="alert">{error}</div>}
+
+      <div className="lu-form-group">
+        <label className="lu-form-label" htmlFor="fullName">Full Name</label>
+        <input id="fullName" name="fullName" required className="lu-input" value={data.fullName} onChange={onChange} autoComplete="name" />
+      </div>
+
+      <div className="lu-form-group">
+        <label className="lu-form-label" htmlFor="email">Email</label>
+        <input id="email" name="email" type="email" required className="lu-input" value={data.email} onChange={onChange} autoComplete="email" />
+      </div>
+
+      <div className="lu-form-group">
+        <label className="lu-form-label" htmlFor="phone">Phone</label>
+        <input id="phone" name="phone" required className="lu-input" value={data.phone} onChange={onChange} autoComplete="tel" placeholder="+91 00000 00000" />
+      </div>
+
+      <div className="lu-form-group">
+        <label className="lu-form-label" htmlFor="address">Shipping Address</label>
+        <textarea id="address" name="address" required className="lu-input" value={data.address} onChange={onChange} rows="3" autoComplete="street-address" style={{ resize: 'vertical' }} />
+      </div>
+
+      <fieldset style={{ border: '1px solid var(--border)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <legend className="lu-form-label">Payment Method</legend>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-secondary)', fontSize: '0.85rem', cursor: 'pointer' }}>
+          <input type="radio" name="paymentMethod" value="card" checked={data.paymentMethod === 'card'} onChange={onChange} style={{ accentColor: 'var(--primary)' }} />
+          Card / UPI (Razorpay)
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-secondary)', fontSize: '0.85rem', cursor: 'pointer' }}>
+          <input type="radio" name="paymentMethod" value="cod" checked={data.paymentMethod === 'cod'} onChange={onChange} style={{ accentColor: 'var(--primary)' }} />
+          Cash on Delivery
+        </label>
+      </fieldset>
+
+      <button
+        type="submit"
+        className="lu-btn-primary"
+        disabled={loading}
+        style={{ width: '100%', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}
+      >
+        {loading ? 'Processing…' : 'Place Order'}
+      </button>
+    </form>
+  );
+});
+
+/* ─── Main Cart Component ─────────────────────────────────── */
+export default function Cart() {
+  const navigate = useNavigate();
+  const { cartItems, addItem, removeItem, deleteItem, clearCart } = useCart();
+  const { user } = useAuth();
+  const { initiatePayment } = useRazorpay();
+
+  const [isPlaced, setIsPlaced] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const { subtotal, taxes, totalItems, grandTotal } = useMemo(() => {
+    const sub = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
+    const tax = Math.round(sub * TAX_RATE);
+    return { subtotal: sub, taxes: tax, totalItems: cartItems.reduce((s, i) => s + i.quantity, 0), grandTotal: sub + tax };
   }, [cartItems]);
 
-  const onChangeField = (event) => {
-    const { name, value } = event.target;
-    setCheckoutData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handlePayment = async () => {
+  const finalizeOrder = async (checkoutData, paymentResponse = {}) => {
     try {
-      // 1. Get Public Key
-      const keyRes = await fetch('/api/payments/key');
-      const { keyId } = await keyRes.json();
-
-      // 2. Create Order on Server
-      const orderRes = await fetch('/api/payments/create-order', {
+      const response = await fetch('/api/v1/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: grandTotal * 100 }), // Amount in paise
-      });
-      const orderData = await orderRes.json();
-
-      if (!orderData.success) {
-        throw new Error('Failed to create payment order');
-      }
-
-      const options = {
-        key: keyId,
-        amount: orderData.data.amount,
-        currency: orderData.data.currency,
-        name: 'AERION',
-        description: 'Purchase of high-performance shuttlecocks',
-        order_id: orderData.data.id,
-        handler: async (response) => {
-          // 3. Verify Payment
-          const verifyRes = await fetch('/api/payments/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-            }),
-          });
-          const verifyData = await verifyRes.json();
-
-          if (verifyData.success) {
-            await finalizeOrder(response);
-          } else {
-            setError('Payment verification failed. Please contact support.');
-          }
-        },
-        prefill: {
-          name: checkoutData.fullName,
-          email: checkoutData.email,
-          contact: checkoutData.phone,
-        },
-        theme: { color: '#ef4444' },
-      };
-
-      if (orderData.mode === 'mock') {
-        // Automatically simulate success in mock mode
-        console.log('Mock Payment Mode Active');
-        await finalizeOrder({
-            razorpay_order_id: orderData.data.id,
-            razorpay_payment_id: 'mock_pay_123',
-            razorpay_signature: 'mock_sig_456'
-        });
-        return;
-      }
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (err) {
-      setError(err.message || 'Payment initialization failed.');
-    }
-  };
-
-  const finalizeOrder = async (paymentResponse = {}) => {
-    try {
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           shippingAddress: {
             fullName: checkoutData.fullName,
@@ -155,208 +130,101 @@ export default function Cart() {
     }
   };
 
-  const onCheckout = async (event) => {
-    event.preventDefault();
+
+  const onCheckout = async (checkoutData) => {
     setError('');
-
-    if (!user) {
-      navigate('/login?redirect=cart');
-      return;
-    }
-
-    if (cartItems.length === 0) {
-      return;
-    }
-
+    if (!user) { navigate('/login?redirect=cart'); return; }
+    if (cartItems.length === 0) return;
     setLoading(true);
 
     if (checkoutData.paymentMethod === 'cod') {
-      await finalizeOrder();
+      await finalizeOrder(checkoutData);
     } else {
-      await handlePayment();
+      await initiatePayment({
+        amount: grandTotal,
+        checkoutData,
+        onSuccess: (payRes) => finalizeOrder(checkoutData, payRes),
+        onFailure: (msg) => { setError(msg); setLoading(false); },
+      });
     }
   };
 
   if (isPlaced) {
     return (
-      <PageWrapper>
-        <section className="section-block page-section">
-          <div className="site-container cart-empty-state">
-            <SectionHeading title="Order Confirmed" subtitle="Your checkout has been placed successfully." />
-            <p className="cart-empty-copy">
-              Thank you for choosing AERION. Our operations team will process your order and share shipping details via
-              email shortly.
-            </p>
-            <div className="cart-empty-actions">
-              <Button onClick={() => navigate('/series')}>Continue Shopping</Button>
-            </div>
+      <div className="lu-cart-page">
+        <div className="lu-container lu-order-success">
+          <div className="lu-order-success-icon">✓</div>
+          <p className="lu-overline lu-gold">Order Confirmed</p>
+          <h1 className="lu-section-title">Thank You</h1>
+          <p style={{ color: 'var(--text-secondary)', maxWidth: '480px', lineHeight: 1.7 }}>
+            Your order has been placed successfully. Our team will process it and share shipping details via email shortly.
+          </p>
+          <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
+            <Link to="/series" className="lu-btn-primary">Continue Shopping</Link>
+            <Link to="/orders" className="lu-btn-ghost">View Orders</Link>
           </div>
-        </section>
-      </PageWrapper>
+        </div>
+      </div>
     );
   }
 
   return (
-    <PageWrapper>
-      <section className="section-block page-section">
-        <div className="site-container">
-          <SectionHeading title="Cart & Checkout" subtitle="Review your order and complete secure checkout." />
-
-          {error && <div className="cart-error-message mb-6 p-4 bg-red-100 text-red-700 rounded-lg">{error}</div>}
-
-          {cartItems.length === 0 ? (
-            <div className="cart-empty-state">
-              <p className="cart-empty-copy">Your cart is empty. Add products to start your checkout.</p>
-              <div className="cart-empty-actions">
-                <Button onClick={() => navigate('/series')}>Explore Flight Series</Button>
-              </div>
-            </div>
-          ) : (
-            <div className="cart-layout">
-              <section className="cart-list" aria-label="Cart Items">
-                <h3 className="cart-title">Order Items ({totalItems})</h3>
-
-                {cartItems.map((item) => (
-                  <article key={item.id || item._id} className="cart-item">
-                    <img src={item.img || item.image} alt={item.name} className="cart-item-image" loading="lazy" decoding="async" />
-
-                    <div className="cart-item-content">
-                      <div className="cart-item-head">
-                        <div>
-                          <h4>{item.name}</h4>
-                          <p>{item.series}</p>
-                        </div>
-                        <span className="cart-item-price">INR {item.price}</span>
-                      </div>
-
-                      <div className="cart-item-actions">
-                        <div className="qty-controls" aria-label={`Quantity controls for ${item.name}`}>
-                          <button type="button" onClick={() => removeItem(item.id || item._id)} aria-label={`Decrease ${item.name}`}>
-                            -
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button type="button" onClick={() => addItem(item)} aria-label={`Increase ${item.name}`}>
-                            +
-                          </button>
-                        </div>
-
-                        <button
-                          type="button"
-                          className="cart-remove"
-                          onClick={() => deleteItem(item.id || item._id)}
-                          aria-label={`Remove ${item.name} from cart`}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </section>
-
-              <aside className="checkout-panel" aria-label="Checkout Summary">
-                <h3 className="cart-title">Checkout Procedure</h3>
-                <ol className="checkout-steps">
-                  <li>Confirm selected products and quantity.</li>
-                  <li>Enter shipping and contact details.</li>
-                  <li>Select payment method and place order.</li>
-                </ol>
-
-                <form className="checkout-form" onSubmit={onCheckout}>
-                  <label>
-                    Full Name
-                    <input
-                      required
-                      name="fullName"
-                      value={checkoutData.fullName}
-                      onChange={onChangeField}
-                      autoComplete="name"
-                    />
-                  </label>
-
-                  <label>
-                    Email
-                    <input
-                      required
-                      type="email"
-                      name="email"
-                      value={checkoutData.email}
-                      onChange={onChangeField}
-                      autoComplete="email"
-                    />
-                  </label>
-
-                  <label>
-                    Phone
-                    <input
-                      required
-                      name="phone"
-                      value={checkoutData.phone}
-                      onChange={onChangeField}
-                      autoComplete="tel"
-                    />
-                  </label>
-
-                  <label>
-                    Shipping Address
-                    <textarea
-                      required
-                      name="address"
-                      value={checkoutData.address}
-                      onChange={onChangeField}
-                      rows="3"
-                      autoComplete="street-address"
-                    />
-                  </label>
-
-                  <fieldset className="payment-group">
-                    <legend>Payment Method</legend>
-                    <label>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="card"
-                        checked={checkoutData.paymentMethod === 'card'}
-                        onChange={onChangeField}
-                      />
-                      Card / UPI (Razorpay)
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="cod"
-                        checked={checkoutData.paymentMethod === 'cod'}
-                        onChange={onChangeField}
-                      />
-                      Cash on Delivery
-                    </label>
-                  </fieldset>
-
-                  <div className="checkout-totals">
-                    <p>
-                      <span>Subtotal</span>
-                      <strong>INR {subtotal}</strong>
-                    </p>
-                    <p>
-                      <span>Taxes (12%)</span>
-                      <strong>INR {taxes}</strong>
-                    </p>
-                    <p className="checkout-grand-total">
-                      <span>Total</span>
-                      <strong>INR {grandTotal}</strong>
-                    </p>
-                  </div>
-
-                  <Button type="submit" className="checkout-submit" disabled={loading} ariaLabel="Place Order">
-                    {loading ? 'Processing...' : 'Place Order'}
-                  </Button>
-                </form>
-              </aside>
-            </div>
-          )}
+    <div className="lu-cart-page">
+      <div className="lu-container">
+        <div className="lu-section-header" style={{ marginBottom: '48px' }}>
+          <p className="lu-overline">Your Selection</p>
+          <h1 className="lu-section-title">Cart & Checkout</h1>
         </div>
-      </section>
-    </PageWrapper>
+
+        {cartItems.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '80px 0' }}>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '28px' }}>Your cart is empty. Discover our collection.</p>
+            <Link to="/series" className="lu-btn-primary">Explore Flight Series</Link>
+          </div>
+        ) : (
+          <div className="lu-cart-layout">
+            {/* Cart Items */}
+            <section className="lu-cart-panel" aria-label="Cart Items">
+              <p className="lu-cart-title">Order Items — {totalItems}</p>
+              {cartItems.map((item) => (
+                <article key={item.id || item._id} className="lu-cart-item">
+                  <img src={item.img || item.image} alt={item.name} className="lu-cart-item-img" loading="lazy" />
+                  <div className="lu-cart-item-body">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <h4 className="lu-cart-item-name">{item.name}</h4>
+                        <p className="lu-cart-item-sub">{item.series || ''}</p>
+                      </div>
+                      <span className="lu-cart-item-price">₹{item.price}</span>
+                    </div>
+                    <div className="lu-cart-item-actions">
+                      <div className="lu-qty-controls">
+                        <button className="lu-qty-btn" type="button" onClick={() => removeItem(item.id || item._id)} aria-label="Decrease">−</button>
+                        <span className="lu-qty-count">{item.quantity}</span>
+                        <button className="lu-qty-btn" type="button" onClick={() => addItem(item)} aria-label="Increase">+</button>
+                      </div>
+                      <button className="lu-cart-remove" type="button" onClick={() => deleteItem(item.id || item._id)}>Remove</button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </section>
+
+            {/* Checkout Panel */}
+            <aside className="lu-cart-panel" aria-label="Checkout">
+              <p className="lu-cart-title">Checkout</p>
+
+              <div className="lu-totals" style={{ marginBottom: '28px' }}>
+                <div className="lu-totals-row"><span>Subtotal</span><span>₹{subtotal}</span></div>
+                <div className="lu-totals-row"><span>GST (12%)</span><span>₹{taxes}</span></div>
+                <div className="lu-totals-row grand"><span>Total</span><strong>₹{grandTotal}</strong></div>
+              </div>
+
+              <CheckoutForm user={user} loading={loading} error={error} onSubmit={onCheckout} />
+            </aside>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

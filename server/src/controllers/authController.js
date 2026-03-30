@@ -2,6 +2,13 @@ import { User } from '../models/User.js';
 import { generateToken } from '../utils/generateToken.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+};
+
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -21,6 +28,8 @@ export const register = asyncHandler(async (req, res) => {
   const user = await User.create({ name, email, password });
   const token = generateToken({ id: user._id, role: user.role });
 
+  res.cookie('aerion_token', token, COOKIE_OPTIONS);
+
   res.status(201).json({
     success: true,
     data: {
@@ -30,7 +39,6 @@ export const register = asyncHandler(async (req, res) => {
         email: user.email,
         role: user.role,
       },
-      token,
     },
   });
 });
@@ -60,6 +68,8 @@ export const login = asyncHandler(async (req, res) => {
 
   const token = generateToken({ id: user._id, role: user.role });
 
+  res.cookie('aerion_token', token, COOKIE_OPTIONS);
+
   res.json({
     success: true,
     data: {
@@ -69,9 +79,17 @@ export const login = asyncHandler(async (req, res) => {
         email: user.email,
         role: user.role,
       },
-      token,
     },
   });
+});
+
+export const logout = asyncHandler(async (_req, res) => {
+  res.clearCookie('aerion_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
+  res.json({ success: true, message: 'Logged out successfully.' });
 });
 
 export const getMe = asyncHandler(async (req, res) => {

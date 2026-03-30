@@ -7,14 +7,8 @@ const API_BASE = '/api/v1';
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('aerion_token'));
 
-  const logout = useCallback(() => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('aerion_token');
-  }, []);
-
+  // Shared fetch helper — credentials: 'include' sends httpOnly cookies automatically
   const request = useCallback(async (endpoint, options = {}) => {
     const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
     const headers = {
@@ -22,16 +16,15 @@ export function AuthProvider({ children }) {
       ...options.headers,
     };
 
-    const currentToken = localStorage.getItem('aerion_token');
-    if (currentToken) {
-      headers['Authorization'] = `Bearer ${currentToken}`;
-    }
-
     try {
-      const response = await fetch(url, { ...options, headers });
-      
+      const response = await fetch(url, {
+        ...options,
+        headers,
+        credentials: 'include', // Always send cookies with every request
+      });
+
       if (response.status === 401) {
-        logout();
+        setUser(null);
         return { success: false, status: 401, message: 'Session expired' };
       }
 
@@ -44,25 +37,27 @@ export function AuthProvider({ children }) {
     } catch (error) {
       return { success: false, message: error.message || 'Network error', status: 500 };
     }
-  }, [logout]);
+  }, []);
 
+  const logout = useCallback(async () => {
+    // Ask the server to clear the httpOnly cookie
+    await request('/auth/logout', { method: 'POST' });
+    setUser(null);
+  }, [request]);
+
+  // On mount, try to restore session from the httpOnly cookie via /auth/me
   useEffect(() => {
     async function checkAuth() {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       const result = await request('/auth/me');
       if (result.success) {
         setUser(result.data);
       } else {
-        logout();
+        setUser(null);
       }
       setLoading(false);
     }
     checkAuth();
-  }, [token, request, logout]);
+  }, [request]);
 
   const login = async (email, password) => {
     const result = await request('/auth/login', {
@@ -71,10 +66,7 @@ export function AuthProvider({ children }) {
     });
 
     if (result.success) {
-      const { user: userData, token: userToken } = result.data;
-      setUser(userData);
-      setToken(userToken);
-      localStorage.setItem('aerion_token', userToken);
+      setUser(result.data.user);
       return { success: true };
     }
     return result;
@@ -87,10 +79,7 @@ export function AuthProvider({ children }) {
     });
 
     if (result.success) {
-      const { user: userData, token: userToken } = result.data;
-      setUser(userData);
-      setToken(userToken);
-      localStorage.setItem('aerion_token', userToken);
+      setUser(result.data.user);
       return { success: true };
     }
     return result;

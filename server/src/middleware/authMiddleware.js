@@ -3,15 +3,22 @@ import { User } from '../models/User.js';
 import { asyncHandler } from './asyncHandler.js';
 
 export const protect = asyncHandler(async (req, _res, next) => {
-  const authHeader = req.headers.authorization || '';
+  // Prefer cookie-based token; fall back to Authorization header for API clients
+  let token = req.cookies?.aerion_token;
 
-  if (!authHeader.startsWith('Bearer ')) {
+  if (!token) {
+    const authHeader = req.headers.authorization || '';
+    if (authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    }
+  }
+
+  if (!token) {
     const err = new Error('Not authorized, token missing.');
     err.statusCode = 401;
     throw err;
   }
 
-  const token = authHeader.split(' ')[1];
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {

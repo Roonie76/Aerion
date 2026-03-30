@@ -64,7 +64,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.5, marginBottom: '4px' }}>Call Us</p>
-                  <p style={{ fontWeight: 700, color: 'var(--text)' }}>+91 90000 00000</p>
+                  <p style={{ fontWeight: 700, color: 'var(--text)' }}>+91 99112 25445</p>
                 </div>
               </div>
 
@@ -74,7 +74,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.5, marginBottom: '4px' }}>Headquarters</p>
-                  <p style={{ fontWeight: 700, color: 'var(--text)' }}>Performance Labs, Aerion Innovation Hub, India</p>
+                  <p style={{ fontWeight: 700, color: 'var(--text)' }}>Sec-92 Gurgaon </p>
                 </div>
               </div>
             </div>
@@ -136,7 +136,8 @@ export default function Contact() {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media (max-width: 868px) {
           .responsive-contact { grid-template-columns: 1fr !important; gap: 48px !important; }
         }

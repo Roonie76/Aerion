@@ -44,7 +44,7 @@ export default function Series() {
   }, [products, activeFilter, sortOrder]);
 
   return (
-    <section className="lu-section" style={{ minHeight: '100vh', paddingTop: '160px' }}>
+    <section className="lu-section" style={{ minHeight: '100vh' }}>
       <div className="lu-container">
         <div className="lu-section-header">
           <p className="lu-overline">The Collection</p>

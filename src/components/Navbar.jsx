@@ -74,9 +74,9 @@ export default function Navbar() {
                   <span className="user-name-short">{user?.name?.split(' ')[0]}</span>
                 </button>
                 <div className="user-dropdown-content glassmorphic-card">
-                  <NavLink to="/orders" className="dropdown-item" onClick={() => setMenuOpen(false)}>
+                  <NavLink to="/account" className="dropdown-item" onClick={() => setMenuOpen(false)}>
                     <Package size={16} />
-                    <span>My Orders</span>
+                    <span>My Account</span>
                   </NavLink>
                   <button
                     type="button"
@@ -147,8 +147,8 @@ export default function Navbar() {
               </NavLink>
             ) : (
               <>
-                <NavLink to="/orders" className="mobile-link-item" onClick={() => setMenuOpen(false)}>
-                  <span>Track Orders</span>
+                <NavLink to="/account" className="mobile-link-item" onClick={() => setMenuOpen(false)}>
+                  <span>My Account</span>
                   <Package size={16} />
                 </NavLink>
                 <button

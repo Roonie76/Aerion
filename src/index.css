@@ -2282,7 +2282,7 @@ ul {
   align-items: center;
   justify-content: center;
   background: radial-gradient(ellipse 80% 60% at 50% 40%, #121626 0%, #05060a 100%);
-  padding: 120px 24px 60px;
+  padding: 180px 24px 80px;
   position: relative;
   overflow: hidden;
 }
@@ -2387,6 +2387,15 @@ ul {
   outline: none;
 }
 
+/* Fix for white background on autocomplete */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0px 1000px #0e1018 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .lu-input:focus {
   border-color: var(--primary);
   background: rgba(201, 168, 76, 0.04);
@@ -2429,7 +2438,7 @@ ul {
 .lu-cart-page {
   min-height: 100vh;
   background: var(--bg);
-  padding: 140px 0 100px;
+  padding: 180px 0 100px;
 }
 
 .lu-cart-layout {
@@ -2612,9 +2621,13 @@ ul {
 /* ══════════════════════════════════════════════
    SERIES PAGE FILTERS (lu-series-*)
 ══════════════════════════════════════════════ */
+.lu-section {
+  padding: 180px 0 100px;
+}
+
 .lu-series-controls {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
   margin-bottom: 56px;
   align-items: center;
@@ -2664,4 +2677,208 @@ ul {
 .lu-sort-select option {
   background: var(--bg-alt);
   color: var(--text);
+}
+
+/* ══════════════════════════════════════════════
+   LUXURY ACCOUNT SYSTEM (lu-account-*)
+══════════════════════════════════════════════ */
+.lu-account-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 180px 0 120px;
+}
+
+.lu-account-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .lu-account-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lu-account-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.lu-profile-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.lu-profile-avatar {
+  width: 80px;
+  height: 80px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 0 30px rgba(var(--primary-rgb), 0.2);
+}
+
+.lu-profile-name {
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.lu-profile-email {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.lu-account-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.lu-account-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 40px;
+}
+
+.lu-account-section-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Order Cards */
+.lu-order-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.lu-order-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+}
+
+.lu-order-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.lu-order-id {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.lu-order-date {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lu-order-status {
+  padding: 4px 12px;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+
+.lu-status-pending { color: #facc15; }
+.lu-status-paid { color: #4ade80; }
+.lu-status-shipped { color: #60a5fa; }
+.lu-status-delivered { color: var(--primary); }
+
+.lu-order-body {
+  padding: 24px;
+}
+
+.lu-order-product {
+  display: grid;
+  grid-template-columns: 48px 1fr 100px;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.lu-order-product:last-child {
+  margin-bottom: 0;
+}
+
+.lu-order-product-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+}
+
+.lu-order-product-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.lu-order-product-meta {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.lu-order-product-total {
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.lu-order-foot {
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.01);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lu-order-total-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+
+.lu-order-total-value {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--primary);
 }

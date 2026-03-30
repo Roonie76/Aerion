@@ -6,7 +6,7 @@ import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
-import { About, Contact, Cart, Home, ProductDetail, Series, Login, Register, Orders } from './pages';
+import { About, Contact, Cart, Home, ProductDetail, Series, Login, Register, Account } from './pages';
 
 export default function App() {
   const location = useLocation();
@@ -48,7 +48,8 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/orders" element={<Orders />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="/orders" element={<Account />} />
             <Route path="*" element={<Home />} />
           </Routes>
         </div>

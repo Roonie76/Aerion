@@ -24,6 +24,7 @@ export default function About() {
   const containerRef = useRef(null);
   const heroRef = useRef(null);
   const blueprintRef = useRef(null);
+  const textBlockRef = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const [hasScrolled, setHasScrolled] = useState(false);
 
@@ -58,20 +59,20 @@ export default function About() {
       gsap.fromTo('.hero-sub', { opacity: 0 }, { opacity: 1, duration: 1.5, delay: 1.2 });
       gsap.fromTo('.hero-scroll-hint', { opacity: 0 }, { opacity: 1, duration: 1, delay: 2 });
 
-      // Blueprint Fade on Scroll
+      // Blueprint parallax fade on scroll
       gsap.to(blueprintRef.current, {
         opacity: 0,
-        y: 100,
-        scale: 0.95,
+        y: 80,
+        scale: 0.96,
         scrollTrigger: {
           trigger: heroRef.current,
           start: 'top top',
           end: 'bottom top',
           scrub: true,
-        }
+        },
       });
 
-      // Stats counter
+      // Stats
       gsap.fromTo('.stat-item', { opacity: 0, y: 30 }, {
         opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: 'power3.out',
         scrollTrigger: { trigger: '.stats-section', start: 'top 80%' },
@@ -103,18 +104,16 @@ export default function About() {
         scrollTrigger: { trigger: '.closing-section', start: 'top 75%' },
       });
 
-      // Gold line horizontal scroll
+      // Marquee
       gsap.fromTo('.marquee-track', { x: '0%' }, { x: '-50%', duration: 30, ease: 'none', repeat: -1 });
 
-      // Parallax on abstract shapes
+      // Ambient parallax
       gsap.to('.parallax-slow', {
-        y: -80,
-        ease: 'none',
+        y: -80, ease: 'none',
         scrollTrigger: { trigger: containerRef.current, start: 'top top', end: 'bottom bottom', scrub: true },
       });
       gsap.to('.parallax-fast', {
-        y: -160,
-        ease: 'none',
+        y: -160, ease: 'none',
         scrollTrigger: { trigger: containerRef.current, start: 'top top', end: 'bottom bottom', scrub: true },
       });
     }, containerRef);
@@ -141,14 +140,12 @@ export default function About() {
         }
 
         * { box-sizing: border-box; }
-
         .font-display { font-family: 'Barlow Condensed', sans-serif; }
-        .font-serif  { font-family: 'Cormorant Garamond', serif; }
+        .font-serif   { font-family: 'Cormorant Garamond', serif; }
+        .gold         { color: var(--gold); }
+        .gold-glow    { text-shadow: 0 0 40px rgba(201,168,76,0.25), 0 0 80px rgba(201,168,76,0.08); }
 
-        .gold { color: var(--gold); }
-        .gold-glow { text-shadow: 0 0 40px rgba(201,168,76,0.25), 0 0 80px rgba(201,168,76,0.08); }
-
-        /* Grain overlay */
+        /* Grain */
         .grain::after {
           content: '';
           position: fixed;
@@ -160,6 +157,52 @@ export default function About() {
         }
 
         .hero-title { perspective: 800px; }
+
+        /*
+         * ── Blueprint image container ──────────────────────────────────
+         *
+         * Sits absolutely inside the hero section.
+         *   top: 0         → flush with top of section = bottom of nav
+         *   height         → measured by BlueprintZone to stop exactly
+         *                    where the text block begins (via --text-top)
+         *
+         * The 16px gap keeps the image from visually bleeding into the overline.
+         */
+        .blueprint-wrap {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: calc(var(--text-top, 128px) - 16px);
+          min-height: 160px;
+          z-index: 0;
+          pointer-events: none;
+          overflow: hidden;
+        }
+
+        .blueprint-wrap img {
+          width: 100%;
+          height: 100%;
+          /*
+           * contain → preserves resolution and aspect ratio without stretching
+           */
+          object-fit: contain;
+          object-position: center bottom;   /* anchor shuttle base toward text */
+          mix-blend-mode: screen;
+          display: block;
+        }
+
+        /* Soft bottom fade so the image dissolves into the background */
+        .blueprint-wrap::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 100px;
+          background: linear-gradient(to bottom, transparent, #090b0f);
+          pointer-events: none;
+        }
 
         /* Stat hover */
         .stat-item {
@@ -193,28 +236,22 @@ export default function About() {
         .marquee-wrap { overflow: hidden; white-space: nowrap; }
         .marquee-track { display: inline-block; }
 
-        /* Scroll hint animation */
         @keyframes scrollBounce {
           0%, 100% { transform: translateY(0); opacity: 0.5; }
-          50% { transform: translateY(8px); opacity: 1; }
+          50%       { transform: translateY(8px); opacity: 1; }
         }
         .scroll-bounce { animation: scrollBounce 2s ease-in-out infinite; }
 
-        /* Divider glow line */
         .divider-line {
           height: 1px;
           background: linear-gradient(to right, transparent, rgba(201,168,76,0.3), transparent);
         }
-
         .line-reveal { transform-origin: left center; }
+        .quote-word  { display: inline-block; }
 
-        /* Closing quote */
-        .quote-word { display: inline-block; }
-
-        /* Shimmer on number */
         @keyframes shimmer {
-          0%  { background-position: -200% center; }
-          100%{ background-position:  200% center; }
+          0%   { background-position: -200% center; }
+          100% { background-position:  200% center; }
         }
         .shimmer-text {
           background: linear-gradient(90deg, var(--gold) 0%, #f8eaaa 50%, var(--gold) 100%);
@@ -224,40 +261,20 @@ export default function About() {
           animation: shimmer 4s linear infinite;
         }
 
-        /* Responsive refinements */
-        @media (max-width: 768px) {
-          .hero-title-word { margin-right: 8px !important; }
-          .hero-overline { margin-bottom: 32px !important; }
-          .hero-sub p { font-size: 1.25rem !important; line-height: 1.6 !important; }
-          
-          .stats-section { py: 64px !important; }
-          .stat-item { padding: 40px 20px !important; }
-          
-          .responsive-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
-          .fade-up h2 { font-size: 2.4rem !important; margin-bottom: 24px !important; }
-          .fade-up p { font-size: 1.1rem !important; }
-          
-          .pillars-section { padding: 80px 20px !important; }
-          .pillar-card { padding: 32px 24px !important; }
-          
-          .closing-section { padding: 80px 24px !important; }
-          .closing-section h2 { font-size: 1.8rem !important; }
-          
-          /* Ambient adjustments */
-          .parallax-slow, .parallax-fast { opacity: 0.4; }
-        }
+        @keyframes spincw  { to { transform: rotate(360deg);  } }
+        @keyframes spinccw { to { transform: rotate(-360deg); } }
 
-        @media (max-width: 480px) {
-          .hero-title-word span { font-size: 4rem !important; }
-          .hero-sub p { font-size: 1.1rem !important; }
-          .stat-item p:first-child { font-size: 1.8rem !important; }
+        @media (max-width: 768px) {
+          .blueprint-wrap img { object-fit: contain; object-position: center center; }
+          .stat-item { padding: 28px 16px !important; }
+          .pillar-card { padding: 28px 20px !important; }
         }
       `}</style>
 
       {/* Grain */}
       <div className="grain pointer-events-none" />
 
-      {/* ── Ambient background orbs ─────────────────────────────────────── */}
+      {/* Ambient orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="parallax-slow absolute rounded-full"
           style={{ width: 700, height: 700, top: '5%', left: '-15%', background: 'radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%)', filter: 'blur(80px)' }} />
@@ -270,68 +287,63 @@ export default function About() {
       {/* ═══════════════════════════════════════════════════════════════════
           HERO
       ═══════════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative z-10 min-h-[65vh] flex flex-col items-center justify-center text-center px-6 pt-32 pb-16">
-        
-        {/* Blueprint background image */}
-        <div 
-          ref={blueprintRef}
-          className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center"
-          style={{ opacity: 0.7 }}
-        >
-          <img 
-            src={aboutBlueprint} 
-            alt="Aerion Shuttlecock Blueprint" 
-            className="w-full h-full object-contain max-w-[1200px]"
-            style={{ mixBlendMode: 'screen' }}
-          />
-          {/* Subtle glow behind the blueprint */}
-          <div 
-            className="absolute inset-0" 
-            style={{ background: 'radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)' }} 
-          />
-        </div>
+      <section
+        ref={heroRef}
+        className="relative z-10 min-h-[65vh] flex flex-col items-center justify-center text-center px-6 pt-32 pb-16"
+      >
+        {/*
+          BlueprintZone measures textBlockRef.offsetTop relative to heroRef
+          and writes it as --text-top on the hero section element.
+          .blueprint-wrap height = calc(--text-top - 16px)
+          → image ends exactly 16px above the first text.
+        */}
+        <BlueprintZone
+          blueprintRef={blueprintRef}
+          heroRef={heroRef}
+          textBlockRef={textBlockRef}
+        />
 
-        {/* Decorative corner marks */}
+        {/* Corner marks */}
         <span className="absolute top-12 left-12 w-8 h-8 border-l border-t opacity-20 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
         <span className="absolute top-12 right-12 w-8 h-8 border-r border-t opacity-20 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
         <span className="absolute bottom-12 left-12 w-8 h-8 border-l border-b opacity-20 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
         <span className="absolute bottom-12 right-12 w-8 h-8 border-r border-b opacity-20 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
 
-        {/* Overline */}
-        <p className="hero-overline font-display text-xs tracking-[0.4em] uppercase mb-10 opacity-50">
-          The Standard · Since Origin
-        </p>
-
-        {/* Main title */}
-        <div className="hero-title mb-12" style={{ maxWidth: 900 }}>
-          {'THE AERION STANDARD'.split(' ').map((word, i) => (
-            <span key={i} className="hero-title-word inline-block mr-4 last:mr-0">
-              <span
-                className="font-display font-black leading-none uppercase"
-                style={{
-                  fontSize: 'clamp(3.5rem, 9vw, 8.5rem)',
-                  letterSpacing: '-0.02em',
-                  color: i === 1 ? 'transparent' : 'var(--cream)',
-                  WebkitTextStroke: i === 1 ? '1px rgba(201,168,76,0.7)' : 'none',
-                  display: 'block',
-                  lineHeight: 0.92,
-                  transition: 'transform 0.3s',
-                  transform: `translateX(${px * (i % 2 === 0 ? 0.4 : -0.4)}px) translateY(${py * 0.3}px)`,
-                }}
-              >
-                {word}
-              </span>
-            </span>
-          ))}
-        </div>
-
-        {/* Sub paragraph */}
-        <div className="hero-sub max-w-xl mx-auto" style={{ fontFamily: 'Cormorant Garamond', fontStyle: 'italic', fontWeight: 300 }}>
-          <p className="text-xl md:text-2xl leading-relaxed" style={{ color: 'rgba(240,237,232,0.55)' }}>
-            Aerion exists to remove uncertainty from the game.
-            Every product is engineered for consistent flight,
-            controlled speed, and precise response.
+        {/* ── Text block — measured by BlueprintZone ── */}
+        <div ref={textBlockRef} className="relative z-10 flex flex-col items-center">
+          <p className="hero-overline font-display text-xs tracking-[0.4em] uppercase mb-10 opacity-50">
+            The Standard · Since Origin
           </p>
+
+          <div className="hero-title mb-12" style={{ maxWidth: 900 }}>
+            {'THE AERION STANDARD'.split(' ').map((word, i) => (
+              <span key={i} className="hero-title-word inline-block mr-4 last:mr-0">
+                <span
+                  className="font-display font-black leading-none uppercase"
+                  style={{
+                    fontSize: 'clamp(3.5rem, 9vw, 8.5rem)',
+                    letterSpacing: '-0.02em',
+                    color: i === 1 ? 'transparent' : 'var(--cream)',
+                    WebkitTextStroke: i === 1 ? '1px rgba(201,168,76,0.7)' : 'none',
+                    display: 'block',
+                    lineHeight: 0.92,
+                    transition: 'transform 0.3s',
+                    transform: `translateX(${px * (i % 2 === 0 ? 0.4 : -0.4)}px) translateY(${py * 0.3}px)`,
+                  }}
+                >
+                  {word}
+                </span>
+              </span>
+            ))}
+          </div>
+
+          <div className="hero-sub max-w-xl mx-auto" style={{ fontFamily: 'Cormorant Garamond', fontStyle: 'italic', fontWeight: 300 }}>
+            <p className="text-xl md:text-2xl leading-relaxed" style={{ color: 'rgba(240,237,232,0.55)' }}>
+              Aerion exists to remove uncertainty from the game.
+              Every product is engineered for consistent flight,
+              controlled speed, and precise response.
+            </p>
+          </div>
         </div>
 
         {/* Scroll hint */}
@@ -344,7 +356,7 @@ export default function About() {
       {/* ─── Marquee ticker ─────────────────────────────────────────────── */}
       <div className="relative z-10 py-6 overflow-hidden" style={{ borderTop: '1px solid rgba(201,168,76,0.1)', borderBottom: '1px solid rgba(201,168,76,0.1)', background: 'rgba(201,168,76,0.02)' }}>
         <div className="marquee-wrap">
-          <div className="marquee-track font-display font-semibold text-sm tracking-[0.3em] uppercase">
+          <div className="marquee-track font-display font-semibold text-sm tracking-[0.3em] uppercase" style={{ color: 'rgba(201,168,76,0.4)' }}>
             {Array(8).fill('PRECISION IN MOTION · ENGINEERED FOR PERFORMANCE · ZERO VARIANCE · AERION ·').join(' ')}&nbsp;
           </div>
         </div>
@@ -379,8 +391,7 @@ export default function About() {
           ENGINEERING — LEFT
       ═══════════════════════════════════════════════════════════════════ */}
       <section className="relative z-10 py-40 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center responsive-grid">
-          {/* Text */}
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
           <div className="fade-up">
             <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-8" style={{ color: 'var(--gold)' }}>Precision Engineering</p>
             <h2 className="font-display font-black uppercase leading-none mb-10" style={{ fontSize: 'clamp(2.8rem,5.5vw,5.5rem)', letterSpacing: '-0.03em', color: 'var(--cream)' }}>
@@ -395,10 +406,8 @@ export default function About() {
             </blockquote>
           </div>
 
-          {/* Visual accent */}
           <div className="fade-up hidden md:flex items-center justify-center">
             <div className="relative" style={{ width: 320, height: 320 }}>
-              {/* Concentric rings */}
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="absolute rounded-full" style={{
                   inset: i * 36,
@@ -414,11 +423,6 @@ export default function About() {
         </div>
       </section>
 
-      <style>{`
-        @keyframes spincw  { to { transform: rotate(360deg);  } }
-        @keyframes spinccw { to { transform: rotate(-360deg); } }
-      `}</style>
-
       {/* ─── Divider ──────────────────────────────────────────────────────── */}
       <div className="relative z-10 px-6 py-4 max-w-5xl mx-auto">
         <div className="line-reveal divider-line" />
@@ -428,12 +432,9 @@ export default function About() {
           TESTING — RIGHT
       ═══════════════════════════════════════════════════════════════════ */}
       <section className="relative z-10 py-40 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center responsive-grid">
-
-          {/* Visual accent */}
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
           <div className="fade-up hidden md:flex items-center justify-center">
             <div className="relative" style={{ width: 300, height: 300 }}>
-              {/* Grid dots */}
               <svg viewBox="0 0 300 300" width="300" height="300" style={{ opacity: 0.25 }}>
                 {Array.from({ length: 8 }).map((_, row) =>
                   Array.from({ length: 8 }).map((__, col) => (
@@ -441,7 +442,6 @@ export default function About() {
                   ))
                 )}
               </svg>
-              {/* Center crosshair */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <svg viewBox="0 0 80 80" width="80" height="80">
                   <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(201,168,76,0.5)" strokeWidth="0.8" />
@@ -456,7 +456,6 @@ export default function About() {
             </div>
           </div>
 
-          {/* Text */}
           <div className="fade-up">
             <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-8" style={{ color: 'var(--gold)' }}>Verification</p>
             <h2 className="font-display font-black uppercase leading-none mb-10" style={{ fontSize: 'clamp(2.8rem,5.5vw,5.5rem)', letterSpacing: '-0.03em', color: 'var(--cream)' }}>
@@ -489,7 +488,6 @@ export default function About() {
               How We Build
             </h2>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {PILLARS.map((p) => (
               <div key={p.num} className="pillar-card p-10 rounded-sm">
@@ -528,33 +526,79 @@ export default function About() {
           CLOSING — PHILOSOPHY
       ═══════════════════════════════════════════════════════════════════ */}
       <section className="closing-section relative z-10 py-40 px-6 text-center" style={{ borderTop: '1px solid rgba(201,168,76,0.08)' }}>
-        {/* Corner accents */}
         <span className="absolute top-12 left-12 w-6 h-6 border-l border-t opacity-15 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
         <span className="absolute top-12 right-12 w-6 h-6 border-r border-t opacity-15 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
 
         <div className="max-w-2xl mx-auto">
           <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-10 opacity-30">Philosophy</p>
-
           <h2 className="font-display font-black uppercase mb-10" style={{ fontSize: 'clamp(1.8rem,4vw,3.5rem)', letterSpacing: '0.08em', color: 'var(--gold)' }}>
             Precision in Motion
           </h2>
-
           <div className="space-y-1 text-sm tracking-widest" style={{ fontFamily: 'Cormorant Garamond', fontStyle: 'italic', lineHeight: 2.2 }}>
             {'No excess. No compromise. Only refinement where it matters. Aerion moves with you—silently, consistently, and without error.'.split(' ').map((word, i) => (
               <span key={i} className="quote-word" style={{ color: 'rgba(240,237,232,0.35)', marginRight: '0.4em' }}>{word}</span>
             ))}
           </div>
-
-          {/* Gold rule */}
           <div className="mt-20 flex items-center justify-center gap-6">
             <div className="h-px flex-1" style={{ background: 'linear-gradient(to right, transparent, rgba(201,168,76,0.25))' }} />
             <div style={{ width: 6, height: 6, background: 'var(--gold)', transform: 'rotate(45deg)', opacity: 0.6 }} />
             <div className="h-px flex-1" style={{ background: 'linear-gradient(to left, transparent, rgba(201,168,76,0.25))' }} />
           </div>
-
           <p className="mt-10 font-display text-[10px] tracking-[0.4em] uppercase opacity-20">Aerion · All Rights Reserved</p>
         </div>
       </section>
+    </div>
+  );
+}
+
+// ─── BlueprintZone ────────────────────────────────────────────────────────────
+//
+// Renders the blueprint image wrapper and keeps its height pixel-accurate by
+// measuring the text block's distance from the hero top on every resize.
+//
+// Layout logic:
+//   • The hero section is `position: relative`
+//   • .blueprint-wrap is `position: absolute; top: 0`
+//   • Its height = textBlockRef.offsetTop - 16px  (16px breathing gap)
+//   • This value is stored as --text-top on the hero element so pure CSS
+//     can consume it, with a sensible fallback of 128px (= Tailwind pt-32)
+//
+function BlueprintZone({ blueprintRef, heroRef, textBlockRef }) {
+  useEffect(() => {
+    function measure() {
+      if (!heroRef.current || !textBlockRef.current) return;
+
+      // offsetTop gives distance from the nearest positioned ancestor (the hero section)
+      const textTop = textBlockRef.current.offsetTop;
+      heroRef.current.style.setProperty('--text-top', `${textTop}px`);
+    }
+
+    measure();
+
+    const ro = new ResizeObserver(measure);
+    if (heroRef.current) ro.observe(heroRef.current);
+    if (textBlockRef.current) ro.observe(textBlockRef.current);
+
+    // Re-measure once custom fonts are loaded (they affect layout height)
+    document.fonts?.ready?.then(measure);
+
+    return () => ro.disconnect();
+  }, [heroRef, textBlockRef]);
+
+  return (
+    <div className="blueprint-wrap" ref={blueprintRef}>
+      <img
+        src={aboutBlueprint}
+        alt="Aerion Shuttlecock Blueprint"
+        style={{ opacity: 0.72 }}
+      />
+      {/* Subtle radial warmth behind the image */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 60% 80% at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 70%)',
+        }}
+      />
     </div>
   );
 }

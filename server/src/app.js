@@ -1,3 +1,4 @@
+import path from 'node:path';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -34,6 +35,16 @@ export function createApp() {
   app.use('/api/v1/cart', cartRoutes);
   app.use('/api/v1/orders', orderRoutes);
   app.use('/api/v1/payments', paymentRoutes);
+
+  // Serve static assets in production
+  if (process.env.NODE_ENV === 'production') {
+    const distPath = path.join(process.cwd(), 'dist');
+    app.use(express.static(distPath));
+    // Serve index.html for any wildcard path to support SPA routing
+    app.get('*', (_req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+  }
 
   app.use(notFound);
   app.use(errorHandler);

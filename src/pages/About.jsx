@@ -275,16 +275,20 @@ export default function About() {
         {/* Blueprint background image */}
         <div 
           ref={blueprintRef}
-          className="absolute inset-0 z-[-1] pointer-events-none overflow-hidden flex items-center justify-center"
-          style={{ opacity: 0.6 }}
+          className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center"
+          style={{ opacity: 0.7 }}
         >
           <img 
             src={aboutBlueprint} 
             alt="Aerion Shuttlecock Blueprint" 
-            className="w-full h-full object-contain max-w-[1200px] mix-blend-screen"
+            className="w-full h-full object-contain max-w-[1200px]"
+            style={{ mixBlendMode: 'screen' }}
           />
           {/* Subtle glow behind the blueprint */}
-          <div className="absolute inset-0 bg-radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%)" />
+          <div 
+            className="absolute inset-0" 
+            style={{ background: 'radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)' }} 
+          />
         </div>
 
         {/* Decorative corner marks */}

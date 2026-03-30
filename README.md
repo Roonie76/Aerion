@@ -29,7 +29,16 @@ We've configured the application to run as a single unit (Monolith) for easy dep
    - `RAZORPAY_KEY_SECRET`: `your_razorpay_key_secret`
    - `PORT`: `10000` (Render's default)
 
-### 3. Local Development
+### 3. Custom Domain Setup
+1. In the **Render Dashboard**, go to your service's **Settings**.
+2. Scroll to **Custom Domains** and click **Add Custom Domain**.
+3. Enter your domain (e.g., `aerion.com`).
+4. Update your domain registrar's DNS settings:
+   - **A Record** (for `@`): Point to `216.24.57.1`
+   - **CNAME Record** (for `www`): Point to your Render URL (e.g., `aerion.onrender.com`).
+5. Render will automatically issue a **Free SSL Certificate** once verified.
+
+### 4. Local Development
 1. Clone the repo.
 2. Run `npm install`.
 3. Create a `.env` in the root (or use the one in `server/`).

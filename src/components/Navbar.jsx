@@ -125,8 +125,8 @@ export default function Navbar() {
         </nav>
       </div>
 
-      <div id="mobile-navigation-panel" className={`mobile-panel-overlay ${menuOpen ? 'open' : ''}`}>
-        <div className="mobile-panel-content glassmorphic-card">
+      <div id="mobile-navigation-panel" className={`mobile-panel-overlay ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(false)}>
+        <div className="mobile-panel-content glassmorphic-card" onClick={(e) => e.stopPropagation()}>
           <nav className="mobile-nav-list" aria-label="Mobile Navigation">
             {navItems.map((item) => (
               <NavLink

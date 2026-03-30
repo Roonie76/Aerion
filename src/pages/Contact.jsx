@@ -101,7 +101,7 @@ export default function Contact() {
             ) : (
               <form onSubmit={handleSubmit} className="lu-form" style={{ padding: '40px', background: 'var(--card)', border: '1px solid var(--border)' }}>
                 {error && <div className="lu-form-error" style={{ marginBottom: '24px' }}>{error}</div>}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '24px' }}>
                   <div className="lu-form-group" style={{ marginBottom: 0 }}>
                     <label className="lu-form-label">Full Name</label>
                     <input type="text" name="name" required className="lu-input" placeholder="Enter name..." value={formData.name} onChange={onChange} />

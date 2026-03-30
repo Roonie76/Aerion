@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "server:dev": "node --watch server/src/server.js",
+    "dev:all": "npm run server:dev & npm run dev",
     "build": "vite build",
     "start": "NODE_ENV=production node server/src/server.js",
     "preview": "vite preview"

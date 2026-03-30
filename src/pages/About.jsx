@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import aboutBlueprint from '../assets/about-blueprint.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,6 +23,7 @@ const PILLARS = [
 export default function About() {
   const containerRef = useRef(null);
   const heroRef = useRef(null);
+  const blueprintRef = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const [hasScrolled, setHasScrolled] = useState(false);
 
@@ -55,6 +57,19 @@ export default function About() {
       });
       gsap.fromTo('.hero-sub', { opacity: 0 }, { opacity: 1, duration: 1.5, delay: 1.2 });
       gsap.fromTo('.hero-scroll-hint', { opacity: 0 }, { opacity: 1, duration: 1, delay: 2 });
+
+      // Blueprint Fade on Scroll
+      gsap.to(blueprintRef.current, {
+        opacity: 0,
+        y: 100,
+        scale: 0.95,
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+        }
+      });
 
       // Stats counter
       gsap.fromTo('.stat-item', { opacity: 0, y: 30 }, {
@@ -208,6 +223,35 @@ export default function About() {
           -webkit-text-fill-color: transparent;
           animation: shimmer 4s linear infinite;
         }
+
+        /* Responsive refinements */
+        @media (max-width: 768px) {
+          .hero-title-word { margin-right: 8px !important; }
+          .hero-overline { margin-bottom: 32px !important; }
+          .hero-sub p { font-size: 1.25rem !important; line-height: 1.6 !important; }
+          
+          .stats-section { py: 64px !important; }
+          .stat-item { padding: 40px 20px !important; }
+          
+          .responsive-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
+          .fade-up h2 { font-size: 2.4rem !important; margin-bottom: 24px !important; }
+          .fade-up p { font-size: 1.1rem !important; }
+          
+          .pillars-section { padding: 80px 20px !important; }
+          .pillar-card { padding: 32px 24px !important; }
+          
+          .closing-section { padding: 80px 24px !important; }
+          .closing-section h2 { font-size: 1.8rem !important; }
+          
+          /* Ambient adjustments */
+          .parallax-slow, .parallax-fast { opacity: 0.4; }
+        }
+
+        @media (max-width: 480px) {
+          .hero-title-word span { font-size: 4rem !important; }
+          .hero-sub p { font-size: 1.1rem !important; }
+          .stat-item p:first-child { font-size: 1.8rem !important; }
+        }
       `}</style>
 
       {/* Grain */}
@@ -226,13 +270,28 @@ export default function About() {
       {/* ═══════════════════════════════════════════════════════════════════
           HERO
       ═══════════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative z-10 min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-16">
+      <section ref={heroRef} className="relative z-10 min-h-[65vh] flex flex-col items-center justify-center text-center px-6 pt-32 pb-16">
+        
+        {/* Blueprint background image */}
+        <div 
+          ref={blueprintRef}
+          className="absolute inset-0 z-[-1] pointer-events-none overflow-hidden flex items-center justify-center"
+          style={{ opacity: 0.6 }}
+        >
+          <img 
+            src={aboutBlueprint} 
+            alt="Aerion Shuttlecock Blueprint" 
+            className="w-full h-full object-contain max-w-[1200px] mix-blend-screen"
+          />
+          {/* Subtle glow behind the blueprint */}
+          <div className="absolute inset-0 bg-radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%)" />
+        </div>
 
         {/* Decorative corner marks */}
-        <span className="absolute top-12 left-12 w-8 h-8 border-l border-t opacity-20" style={{ borderColor: 'var(--gold)' }} />
-        <span className="absolute top-12 right-12 w-8 h-8 border-r border-t opacity-20" style={{ borderColor: 'var(--gold)' }} />
-        <span className="absolute bottom-12 left-12 w-8 h-8 border-l border-b opacity-20" style={{ borderColor: 'var(--gold)' }} />
-        <span className="absolute bottom-12 right-12 w-8 h-8 border-r border-b opacity-20" style={{ borderColor: 'var(--gold)' }} />
+        <span className="absolute top-12 left-12 w-8 h-8 border-l border-t opacity-20 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
+        <span className="absolute top-12 right-12 w-8 h-8 border-r border-t opacity-20 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
+        <span className="absolute bottom-12 left-12 w-8 h-8 border-l border-b opacity-20 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
+        <span className="absolute bottom-12 right-12 w-8 h-8 border-r border-b opacity-20 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
 
         {/* Overline */}
         <p className="hero-overline font-display text-xs tracking-[0.4em] uppercase mb-10 opacity-50">
@@ -316,7 +375,7 @@ export default function About() {
           ENGINEERING — LEFT
       ═══════════════════════════════════════════════════════════════════ */}
       <section className="relative z-10 py-40 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center responsive-grid">
           {/* Text */}
           <div className="fade-up">
             <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-8" style={{ color: 'var(--gold)' }}>Precision Engineering</p>
@@ -365,7 +424,7 @@ export default function About() {
           TESTING — RIGHT
       ═══════════════════════════════════════════════════════════════════ */}
       <section className="relative z-10 py-40 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center responsive-grid">
 
           {/* Visual accent */}
           <div className="fade-up hidden md:flex items-center justify-center">
@@ -466,8 +525,8 @@ export default function About() {
       ═══════════════════════════════════════════════════════════════════ */}
       <section className="closing-section relative z-10 py-40 px-6 text-center" style={{ borderTop: '1px solid rgba(201,168,76,0.08)' }}>
         {/* Corner accents */}
-        <span className="absolute top-12 left-12 w-6 h-6 border-l border-t opacity-15" style={{ borderColor: 'var(--gold)' }} />
-        <span className="absolute top-12 right-12 w-6 h-6 border-r border-t opacity-15" style={{ borderColor: 'var(--gold)' }} />
+        <span className="absolute top-12 left-12 w-6 h-6 border-l border-t opacity-15 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
+        <span className="absolute top-12 right-12 w-6 h-6 border-r border-t opacity-15 hidden md:block" style={{ borderColor: 'var(--gold)' }} />
 
         <div className="max-w-2xl mx-auto">
           <p className="font-display text-[10px] tracking-[0.4em] uppercase mb-10 opacity-30">Philosophy</p>

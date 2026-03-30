@@ -1100,8 +1100,15 @@ ul {
 
 .detail-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .detail-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 }
 
 .detail-image {
@@ -1741,6 +1748,12 @@ ul {
   margin: 0 auto;
 }
 
+@media (max-width: 768px) {
+  .lu-container {
+    width: min(1240px, calc(100% - 32px));
+  }
+}
+
 /* ── Scroll-in animation ── */
 .lu-fade-up {
   opacity: 0;
@@ -1877,10 +1890,10 @@ ul {
 }
 
 .lu-hero-headline {
-  font-size: clamp(3.8rem, 10vw, 8rem);
+  font-size: clamp(3.2rem, 12vw, 8.5rem);
   font-weight: 950;
-  line-height: 0.9;
-  letter-spacing: -0.04em;
+  line-height: 0.88;
+  letter-spacing: -0.045em;
   text-transform: uppercase;
   color: var(--text);
   margin: 0 0 32px;
@@ -1954,7 +1967,7 @@ ul {
 }
 
 .lu-section-title {
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-size: clamp(2rem, 6vw, 3.8rem);
   font-weight: 900;
   letter-spacing: -0.03em;
   text-transform: uppercase;
@@ -1977,7 +1990,20 @@ ul {
 .lu-products-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 48px;
+  gap: 32px;
+}
+
+@media (max-width: 1100px) {
+  .lu-products-grid {
+    gap: 24px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .lu-products-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .lu-card {
@@ -2089,6 +2115,18 @@ ul {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .lu-features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .lu-features-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .lu-feature {
@@ -2235,10 +2273,7 @@ ul {
 }
 
 @media (max-width: 768px) {
-  .lu-products-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
+  /* lu-products-grid consolidated */
 
   .lu-section {
     padding: 96px 0;
@@ -2248,10 +2283,7 @@ ul {
     display: none;
   }
 
-  .lu-features-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
+  /* lu-features-grid consolidated */
 
   .lu-philosophy-text {
     font-size: 1.1rem;

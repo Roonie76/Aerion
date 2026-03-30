@@ -1,5 +1,5 @@
 // UPDATED: Standardized Cinematic App Container
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Lenis from 'lenis'; // FIXED
 import gsap from 'gsap';
@@ -11,12 +11,15 @@ import { About, Contact, Cart, Home, ProductDetail, Series, Login, Register, Acc
 export default function App() {
   const location = useLocation();
 
+  const lenisRef = useRef(null);
+
   useEffect(() => {
     // UPDATED: correct modern Lenis setup
     const lenis = new Lenis({
       lerp: 0.08,
       smoothWheel: true,
     });
+    lenisRef.current = lenis;
 
     // UPDATED: Sync ScrollTrigger with Lenis
     lenis.on('scroll', ScrollTrigger.update);
@@ -31,8 +34,18 @@ export default function App() {
     return () => {
       lenis.destroy();
       gsap.ticker.remove(updateLenis);
+      lenisRef.current = null;
     };
   }, []);
+
+  // Force scroll to top on page change
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
 
   return (
     <div className="app-shell">

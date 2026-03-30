@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
+import { useAuth } from '../context';
 import { PRODUCTS as STATIC_PRODUCTS } from '../data/products';
 
 const FILTERS = ['All', 'Professional', 'Intermediate', 'Training'];
@@ -10,16 +11,14 @@ export default function Series() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
   const [sortOrder, setSortOrder] = useState('default');
+  const { request } = useAuth();
 
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch('/api/v1/products');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success && data.data.length > 0) {
-            setProducts(data.data);
-          }
+        const result = await request('/products');
+        if (result.success && result.data.length > 0) {
+          setProducts(result.data);
         }
       } catch {
         // fallback to static data

@@ -17,7 +17,7 @@ export default function Account() {
 
     async function fetchOrders() {
       try {
-        const result = await request('/orders/my-orders');
+        const result = await request('/orders/my');
         if (result.success) {
           setOrders(result.data);
         }

@@ -1,28 +1,24 @@
 /**
  * useRazorpay — A hook to encapsulate Razorpay initialization and payment flow.
- * Keeps payment infrastructure out of Cart.jsx and other UI components.
- *
- * Usage:
- *   const { initiatePayment } = useRazorpay();
- *   await initiatePayment({ amount, checkoutData, onSuccess, onFailure });
  */
+import { useAuth } from '../context';
+
 export function useRazorpay() {
+  const { request } = useAuth();
   const initiatePayment = async ({ amount, checkoutData, onSuccess, onFailure }) => {
     try {
       // 1. Fetch the Razorpay public key from the server
-      const keyRes = await fetch('/api/v1/payments/key', { credentials: 'include' });
-      if (!keyRes.ok) throw new Error('Could not fetch payment configuration.');
-      const { keyId } = await keyRes.json();
+      const keyRes = await request('/payments/key');
+      if (!keyRes.success) throw new Error(keyRes.message || 'Could not fetch payment configuration.');
+      const { keyId } = keyRes.data;
 
       // 2. Create a Razorpay order on the server
-      const orderRes = await fetch('/api/v1/payments/create-order', {
+      const orderRes = await request('/payments/create-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ amount: amount * 100 }), // convert to paise
       });
-      const orderData = await orderRes.json();
-      if (!orderData.success) throw new Error('Failed to create payment order.');
+      if (!orderRes.success) throw new Error(orderRes.message || 'Failed to create payment order.');
+      const orderData = orderRes.data;
 
       // 3. Mock mode — skip actual Razorpay flow
       if (orderData.mode === 'mock') {
@@ -50,22 +46,19 @@ export function useRazorpay() {
         theme: { color: '#c9a84c' }, // Aerion Gold
         handler: async (response) => {
           // 5. Verify signature on the server
-          const verifyRes = await fetch('/api/v1/payments/verify', {
+          const verifyRes = await request('/payments/verify', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
             body: JSON.stringify({
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             }),
           });
-          const verifyData = await verifyRes.json();
 
-          if (verifyData.success && verifyData.verified) {
+          if (verifyRes.success && verifyRes.data.verified) {
             await onSuccess(response);
           } else {
-            onFailure('Payment signature verification failed. Please contact support.');
+            onFailure(verifyRes.message || 'Payment signature verification failed.');
           }
         },
       };

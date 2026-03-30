@@ -98,10 +98,8 @@ export default function Cart() {
 
   const finalizeOrder = async (checkoutData, paymentResponse = {}) => {
     try {
-      const response = await fetch('/api/v1/orders', {
+      const result = await request('/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           shippingAddress: {
             fullName: checkoutData.fullName,
@@ -116,12 +114,11 @@ export default function Cart() {
         }),
       });
 
-      if (response.ok) {
+      if (result.success) {
         setIsPlaced(true);
         clearCart();
       } else {
-        const err = await response.json();
-        throw new Error(err.message || 'Failed to record order.');
+        throw new Error(result.message || 'Failed to record order.');
       }
     } catch (err) {
       setError(err.message);

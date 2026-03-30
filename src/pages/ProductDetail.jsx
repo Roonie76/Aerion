@@ -3,13 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../components/Button';
 import PageWrapper from '../components/PageWrapper';
 import SectionHeading from '../components/SectionHeading';
-import { useCart } from '../context';
+import { useCart, useAuth } from '../context';
 import { PRODUCTS as STATIC_PRODUCTS } from '../data/products';
 
 export default function ProductDetail() {
   const navigate = useNavigate();
   const { productId } = useParams();
   const { addItem } = useCart();
+  const { request } = useAuth();
   
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,12 +18,9 @@ export default function ProductDetail() {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(`/api/products/${productId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setProduct(data.data);
-          }
+        const result = await request(`/products/${productId}`);
+        if (result.success) {
+          setProduct(result.data);
         }
         
         // Final fallback to static data if not found in backend

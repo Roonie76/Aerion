@@ -1,3 +1,4 @@
+// NEW: Reusable 3D Tilt Hook
 import { useEffect, useRef } from 'react';
 
 export default function useTiltEffect(maxTilt = 15, perspective = 1000) {

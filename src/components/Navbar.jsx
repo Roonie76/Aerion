@@ -36,10 +36,11 @@ export default function Navbar() {
 
   return (
     <header className={`site-header ${scrolled ? 'scrolled' : ''}`}>
-      <div className="site-container header-inner">
+      <div className="header-inner">
         <div className="header-left">
           <NavLink to="/" className="brand-logo-link" aria-label="AERION Home" onClick={() => setMenuOpen(false)}>
-            <img src={logo} alt="AERION Logo" className="brand-image-logo" />
+            <img src={logo} alt="AERION Mark" className="brand-image-logo" />
+            <span className="brand-text">AERION</span>
           </NavLink>
         </div>
 

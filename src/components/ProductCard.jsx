@@ -1,33 +1,28 @@
+// UPDATED: Interactive Product Card with 3D Tilt and Motion
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 import { useCart } from '../context';
 import useTiltEffect from '../hooks/useTiltEffect';
 
-// NEW: Price Counter Component for Micro-interaction
+import gsap from 'gsap';
+
+// NEW: Refined Price Counter using GSAP
 function PriceCounter({ value }) {
   const [displayValue, setDisplayValue] = useState(0);
   const countRef = useRef(null);
+  const proxy = useRef({ val: 0 });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          let start = 0;
-          const end = parseInt(value);
-          const duration = 1000;
-          const increment = end / (duration / 16);
-          
-          const timer = setInterval(() => {
-            start += increment;
-            if (start >= end) {
-              setDisplayValue(end);
-              clearInterval(timer);
-            } else {
-              setDisplayValue(Math.floor(start));
-            }
-          }, 16);
-          return () => clearInterval(timer);
+          gsap.to(proxy.current, {
+            val: parseInt(value),
+            duration: 2,
+            ease: "power3.out",
+            onUpdate: () => setDisplayValue(Math.floor(proxy.current.val))
+          });
         }
       },
       { threshold: 0.1 }

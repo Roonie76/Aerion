@@ -1,3 +1,4 @@
+// UPDATED: Standardized Cinematic App Container
 import React, { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Lenis from 'lenis'; // FIXED
@@ -17,17 +18,19 @@ export default function App() {
       smoothWheel: true,
     });
 
-    // OPTIONAL: sync Lenis with GSAP ScrollTrigger
+    // UPDATED: Sync ScrollTrigger with Lenis
     lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
+    const updateLenis = (time) => {
       lenis.raf(time * 1000);
-    });
+    };
+
+    gsap.ticker.add(updateLenis);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
       lenis.destroy();
-      gsap.ticker.remove((time) => lenis.raf(time * 1000));
+      gsap.ticker.remove(updateLenis);
     };
   }, []);
 

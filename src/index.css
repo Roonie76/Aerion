@@ -2387,6 +2387,11 @@ ul {
   outline: none;
 }
 
+select.lu-input option {
+  background: #0e1018; /* Solid dark background for dropdown items */
+  color: var(--text);
+}
+
 /* Fix for white background on autocomplete */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,

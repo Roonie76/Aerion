@@ -9,6 +9,7 @@ import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 dotenv.config();
@@ -35,6 +36,7 @@ export function createApp() {
   app.use('/api/v1/cart', cartRoutes);
   app.use('/api/v1/orders', orderRoutes);
   app.use('/api/v1/payments', paymentRoutes);
+  app.use('/api/v1/contact', contactRoutes);
 
   // Serve static assets in production
   if (process.env.NODE_ENV === 'production') {

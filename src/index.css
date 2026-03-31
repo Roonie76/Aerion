@@ -170,8 +170,6 @@ ul {
   background: var(--bg);
 }
 
-
-
 .route-shell {
   animation: routeIn 260ms ease-out;
 }

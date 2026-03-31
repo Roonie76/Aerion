@@ -1,4 +1,14 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
+import { 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut,
+  updateProfile,
+  signInWithPopup,
+  GoogleAuthProvider
+} from 'firebase/auth';
+import { auth } from '../firebase';
 
 const AuthContext = createContext(undefined);
 
@@ -8,11 +18,19 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Shared fetch helper — credentials: 'include' sends httpOnly cookies automatically
+  // Maintain custom request handler to ensure your core backend (Products/Orders/etc)
+  // still functions properly, but now inject the Firebase JWT token securely!
   const request = useCallback(async (endpoint, options = {}) => {
     const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+    
+    let token = '';
+    if (auth.currentUser) {
+      token = await auth.currentUser.getIdToken();
+    }
+
     const headers = {
       'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       ...options.headers,
     };
 
@@ -20,12 +38,11 @@ export function AuthProvider({ children }) {
       const response = await fetch(url, {
         ...options,
         headers,
-        credentials: 'include', // Always send cookies with every request
+        credentials: 'include', // Retains compatibility if your backend still requires session cookies
       });
 
       if (response.status === 401) {
-        setUser(null);
-        return { success: false, status: 401, message: 'Session expired' };
+        return { success: false, status: 401, message: 'Session expired or unauthorized' };
       }
 
       const data = await response.json();
@@ -40,49 +57,75 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(async () => {
-    // Ask the server to clear the httpOnly cookie
-    await request('/auth/logout', { method: 'POST' });
-    setUser(null);
-  }, [request]);
+    await signOut(auth);
+  }, []);
 
-  // On mount, try to restore session from the httpOnly cookie via /auth/me
+  // Automatically track Firebase user auth state transitions
   useEffect(() => {
-    async function checkAuth() {
-      const result = await request('/auth/me');
-      if (result.success) {
-        setUser(result.data);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser({
+          uid: currentUser.uid,
+          email: currentUser.email,
+          name: currentUser.displayName || currentUser.email.split('@')[0], 
+        });
       } else {
         setUser(null);
       }
       setLoading(false);
-    }
-    checkAuth();
-  }, [request]);
-
-  const login = async (email, password) => {
-    const result = await request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
     });
 
-    if (result.success) {
-      setUser(result.data.user);
+    return () => unsubscribe();
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
+    } catch (error) {
+      // Create user-friendly Firebase errors
+      let msg = 'Failed to login.';
+      if (error.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
+      if (error.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later.';
+      return { success: false, message: msg };
     }
-    return result;
   };
 
   const register = async (name, email, password) => {
-    const result = await request('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify({ name, email, password }),
-    });
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Overwrite the Firebase display name with our user's input
+      await updateProfile(userCredential.user, {
+        displayName: name
+      });
+      
+      setUser({
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        name: name,
+      });
 
-    if (result.success) {
-      setUser(result.data.user);
       return { success: true };
+    } catch (error) {
+      let msg = 'Registration failed.';
+      if (error.code === 'auth/email-already-in-use') msg = 'This email is already registered.';
+      if (error.code === 'auth/weak-password') msg = 'Password should be at least 6 characters.';
+      return { success: false, message: msg };
     }
-    return result;
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      return { success: true };
+    } catch (error) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        return { success: false, message: 'Google sign-in was cancelled.' };
+      }
+      return { success: false, message: error.message };
+    }
   };
 
   const value = useMemo(
@@ -91,6 +134,7 @@ export function AuthProvider({ children }) {
       loading,
       login,
       register,
+      signInWithGoogle,
       logout,
       request,
       isAuthenticated: !!user,

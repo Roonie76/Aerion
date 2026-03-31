@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "db:migrate": "node src/scripts/migrate.js",
+    "db:seed": "node src/scripts/seed.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -13,9 +15,13 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.3.2",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.1",
-    "morgan": "^1.10.1",
-    "razorpay": "^2.9.6"
+    "nodemailer": "^8.0.4",
+    "pg": "^8.20.0",
+    "razorpay": "^2.9.6",
+    "redis": "^5.11.0",
+    "winston": "^3.19.0"
   }
 }

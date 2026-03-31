@@ -96,9 +96,15 @@ export default function Cart() {
     return { subtotal: sub, taxes: tax, totalItems: cartItems.reduce((s, i) => s + i.quantity, 0), grandTotal: sub + tax };
   }, [cartItems]);
 
-  const finalizeOrder = async (checkoutData, paymentResponse = {}) => {
+  const onCheckout = async (checkoutData) => {
+    setError('');
+    if (!user) { navigate('/login?redirect=cart'); return; }
+    if (cartItems.length === 0) return;
+    setLoading(true);
+
     try {
-      const result = await request('/orders', {
+      // 1. Create the base order first
+      const orderRes = await request('/orders', {
         method: 'POST',
         body: JSON.stringify({
           shippingAddress: {
@@ -108,41 +114,40 @@ export default function Cart() {
             address: checkoutData.address,
           },
           paymentMethod: checkoutData.paymentMethod,
-          razorpayOrderId: paymentResponse.razorpay_order_id,
-          razorpayPaymentId: paymentResponse.razorpay_payment_id,
-          razorpaySignature: paymentResponse.razorpay_signature,
         }),
       });
 
-      if (result.success) {
+      if (!orderRes.success) {
+        throw new Error(orderRes.message || 'Failed to create order.');
+      }
+
+      const orderId = orderRes.data.id;
+
+      // 2. If Cash on Delivery, fast-track to success
+      if (checkoutData.paymentMethod === 'cod') {
         setIsPlaced(true);
         clearCart();
-      } else {
-        throw new Error(result.message || 'Failed to record order.');
+        setLoading(false);
+        return;
       }
+
+      // 3. For card transactions, request intent tracking via the orderId
+      await initiatePayment({
+        orderId,
+        checkoutData,
+        onSuccess: () => {
+          setIsPlaced(true);
+          clearCart();
+          setLoading(false);
+        },
+        onFailure: (msg) => {
+          setError(msg);
+          setLoading(false);
+        },
+      });
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
-    }
-  };
-
-
-  const onCheckout = async (checkoutData) => {
-    setError('');
-    if (!user) { navigate('/login?redirect=cart'); return; }
-    if (cartItems.length === 0) return;
-    setLoading(true);
-
-    if (checkoutData.paymentMethod === 'cod') {
-      await finalizeOrder(checkoutData);
-    } else {
-      await initiatePayment({
-        amount: grandTotal,
-        checkoutData,
-        onSuccess: (payRes) => finalizeOrder(checkoutData, payRes),
-        onFailure: (msg) => { setError(msg); setLoading(false); },
-      });
     }
   };
 

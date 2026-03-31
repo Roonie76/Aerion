@@ -1,28 +1,61 @@
-import path from 'node:path';
-import dotenv from 'dotenv';
-import { createApp } from './app.js';
-import { connectDB } from './config/db.js';
+import { createApp } from './app/index.js';
+import { env } from './shared/config/env.js';
+import { logger } from './shared/config/logger.js';
+import { closePool, healthcheck } from './shared/db/index.js';
+import { startOutboxWorker, stopOutboxWorker } from './shared/events/outbox.service.js';
+import { startReservationSweeper, stopReservationSweeper } from './shared/events/reservationSweeper.js';
 
-// Point to server/.env if run from root
-dotenv.config({ path: path.join(process.cwd(), 'server', '.env') });
-// Also try standard .env in case it's run from server/ dir
-dotenv.config();
+let server;
 
-const PORT = process.env.PORT || 5000;
+async function shutdown(signal) {
+  logger.info('Shutting down server', { signal });
 
-async function bootstrap() {
-  await connectDB();
+  stopOutboxWorker();
+  stopReservationSweeper();
 
-  const app = createApp();
+  if (server) {
+    await new Promise((resolve, reject) => {
+      server.close((error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve();
+      });
+    });
+  }
 
-  app.listen(PORT, () => {
-    // eslint-disable-next-line no-console
-    console.log(`Server running on port ${PORT}`);
-  });
+  await closePool();
+  process.exit(0);
 }
 
-bootstrap().catch((error) => {
-  // eslint-disable-next-line no-console
-  console.error('Server failed to start:', error);
+async function bootstrap() {
+  await healthcheck();
+  const app = createApp();
+  server = app.listen(env.PORT, () => {
+    logger.info('API server started', { port: env.PORT, env: env.NODE_ENV });
+  });
+
+  startOutboxWorker();
+  startReservationSweeper();
+}
+
+bootstrap().catch(async (error) => {
+  logger.error('Server bootstrap failed', { error: error.message });
+  await closePool();
   process.exit(1);
+});
+
+process.on('SIGINT', () => {
+  shutdown('SIGINT').catch((error) => {
+    logger.error('Graceful shutdown failed', { error: error.message });
+    process.exit(1);
+  });
+});
+
+process.on('SIGTERM', () => {
+  shutdown('SIGTERM').catch((error) => {
+    logger.error('Graceful shutdown failed', { error: error.message });
+    process.exit(1);
+  });
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, ShoppingCart, User, X, LogOut, Package, ChevronRight, Search } from 'lucide-react';
+import { Menu, ShoppingCart, User, X, LogOut, Package, ChevronRight } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useCart, useAuth } from '../context';
 import logo from '../assets/logo.png';
@@ -61,10 +61,6 @@ export default function Navbar() {
           </div>
 
           <div className="nav-actions">
-            <button className="icon-button search-trigger" aria-label="Search">
-              <Search size={18} />
-            </button>
-
             {isAuthenticated ? (
               <div className="user-dropdown">
                 <button className="user-menu-trigger glassmorphic-card">

@@ -45,7 +45,6 @@ export default function ProductCard({ product }) {
   const handleAddToCart = (e) => {
     e.stopPropagation();
     addItem(product);
-    navigate('/cart');
   };
 
   const productId = product.id || product._id;

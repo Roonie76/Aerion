@@ -208,9 +208,21 @@ export async function createOrderFromCart(userId, payload) {
       payload: {
         orderId: orderRecord.id,
         orderNumber: orderRecord.order_number,
+        subtotalAmount,
+        discountAmount,
+        shippingAmount,
+        taxAmount,
         totalAmount,
         currency: 'INR',
         customerEmail: user.email,
+        customerName: user.name || null,
+        items: checkoutItems.map((it) => ({
+          name: it.name,
+          quantity: it.quantity,
+          unitPrice: it.unitPrice,
+          lineTotal: it.lineTotal,
+        })),
+        shippingAddress,
       },
     });
 

@@ -54,6 +54,7 @@ export const env = {
   SMTP_USER: process.env.SMTP_USER || process.env.EMAIL_USER || '',
   SMTP_PASS: process.env.SMTP_PASS || process.env.EMAIL_PASS || '',
   EMAIL_FROM: process.env.EMAIL_FROM || 'no-reply@aerion.local',
+  OPS_EMAIL: process.env.OPS_EMAIL || '',
   CRM_WEBHOOK_URL: process.env.CRM_WEBHOOK_URL || '',
   REDIS_URL: process.env.REDIS_URL || '',
   OUTBOX_POLL_INTERVAL_MS: parseNumber(process.env.OUTBOX_POLL_INTERVAL_MS, 5000),

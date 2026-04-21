@@ -1,0 +1,35 @@
+
+> aerion@1.0.0 server:dev
+> node --watch server/src/server.js
+
+2026-04-19T06:21:45.051Z [32minfo[39m: Outbox worker started {"service":"aerion-api","intervalMs":5000}
+2026-04-19T06:21:45.054Z [32minfo[39m: Reservation sweeper started {"service":"aerion-api","intervalMs":60000}
+2026-04-19T06:21:45.055Z [32minfo[39m: API server started {"service":"aerion-api","port":5000,"env":Restarting 'server/src/server.js'
+Failed running 'server/src/server.js'. Waiting for file changes before restarting...
+Restarting 'server/src/server.js'
+Failed running 'server/src/server.js'. Waiting for file changes before restarting...
+Restarting 'server/src/server.js'
+2026-04-19T06:38:53.471Z [32minfo[39m: Outbox worker started {"service":"aerion-api","intervalMs":5000}
+2026-04-19T06:38:53.474Z [32minfo[39m: Reservation sweeper started {"service":"aerion-api","intervalMs":60000}
+2026-04-19T06:38:53.474Z [32minfo[39m: API server started {"service":"aerion-api","port2026-04-19T06:38:53.482Z [32Restarting 'server/src/server.js'
+2026-04-19T06:39:27.739Z [32minfo[39m: Outbox worker started {"service":"aerion-api","intervalMs":5000}
+2026-04-19T06:39:27.741Z [32minfo[39m: Reservation sweeper started {"service":"aerion-api","intervalMs":60000}
+2026-04-19T06:39:27.742Z [32minfo[39m: API server started {"service":"aerion-api","port":5000,"env":"development"}
+2026-04-19T07:22:30.198Z [31merror[39m: Unexpected PostgreSQL pool error {"service":"aerion-api","error":"terminating connection due to administrator command"}
+2026-04-19T07:22:31.269Z [31merror[39m: Outbox worker batch failed {"service":"aerion-api","error":"connect ECONNREFUSED 127.0.0.1:5432"}
+2026-04-19T07:22:36.276Z [31merror[39m: Outbox worker batch failed {"service":"aerion-api","error":"connect ECONNREFUSED 127.0.0.1:5432"}
+2026-04-19T07:22:41.278Z [31merror[39m: Outbox worker batch failed {"service":"aerion-api","error":"connect ECONNREFUSED 127.0.0.1:5432"}
+Restarting 'server/src/server.js'
+2026-04-19T07:22:44.897Z [31merror[39m: Server bootstrap failed {"service":"aerion-api","error":"connect ECONNREFUSED 127.0.0.1:5432"}
+Failed running 'server/src/server.js'. Waiting for file changes before restarting...
+Restarting 'server/src/server.js'
+2026-04-19T07:27:02.835Z [31merror[39m: Server bootstrap failed {"service":"aerion-api","error":"password authentication failed for user \"postgres\""}
+Failed running 'server/src/server.js'. Waiting for file changes before restarting...
+vice":"aerion-api","error":"connect ECONNREFUSED 127.0.0.1:5432"}
+2026-04-19T07:22:41.341Z [31merror[39m: Outbox worker batch failed {"service":"aerion-api","error":"connect ECONNREFUSED 127.0.0.1:5432"}
+Restarting 'server/src/server.js'
+2026-04-19T07:22:44.934Z [31merror[39m: Server bootstrap failed {"service":"aerion-api","error":"connect ECONNREFUSED 127.0.0.1:5432"}
+Failed running 'server/src/server.js'. Waiting for file changes before restarting...
+Restarting 'server/src/server.js'
+2026-04-19T07:27:01.553Z [31merror[39m: Server bootstrap failed {"service":"aerion-api","error":"password authentication failed for user \"postgres\""}
+Failed running 'server/src/server.js'. Waiting for file changes before restarting...

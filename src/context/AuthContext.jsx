@@ -67,7 +67,8 @@ export function AuthProvider({ children }) {
         setUser({
           uid: currentUser.uid,
           email: currentUser.email,
-          name: currentUser.displayName || currentUser.email.split('@')[0], 
+          name: currentUser.displayName || currentUser.email.split('@')[0],
+          phone: currentUser.phoneNumber || '',
         });
       } else {
         setUser(null);
@@ -91,7 +92,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, phone = '') => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
@@ -104,6 +105,7 @@ export function AuthProvider({ children }) {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
         name: name,
+        phone,
       });
 
       return { success: true };

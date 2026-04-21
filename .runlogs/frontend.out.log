@@ -1,0 +1,16 @@
+
+> aerion@1.0.0 dev
+> vite --host 127.0.0.1
+
+
+  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m563[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m11:52:10 am[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33mreact-router-dom, gsap, gsap/ScrollTrigger[32m[39m
+[2m11:52:10 am[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m
+[2m11:58:30 am[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33mreact-dom/client, lenis[32m[39m
+[2m11:58:30 am[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m
+[2m11:58:38 am[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33mfirebase/auth, lucide-react, firebase/app, firebase/analytics, three[32m[39m
+[2m11:58:38 am[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m
+[2m12:16:44 pm[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m12:16:44 pm[22m [36m[1m[vite][22m[39m server restarted.

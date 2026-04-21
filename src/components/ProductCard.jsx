@@ -1,7 +1,9 @@
 // UPDATED: Interactive Product Card with 3D Tilt and Motion
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Minus, Plus } from 'lucide-react';
 import Button from './Button';
+import Picture from './Picture';
 import { useCart } from '../context';
 import useTiltEffect from '../hooks/useTiltEffect';
 
@@ -37,31 +39,53 @@ function PriceCounter({ value }) {
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
-  const { addItem } = useCart();
+  const { cartItems, addItem, removeItem } = useCart();
   
-  // UPDATED: 3D Tilt Effect
-  const tiltRef = useTiltEffect(10, 1000);
+  // UPDATED: Subtle 3D Tilt Effect
+  const tiltRef = useTiltEffect(5, 1000);
   
+  const productId = product.id || product._id;
+  const productImage = product.img || product.image;
+
+  // NEW: Get current quantity in cart
+  const cartItem = cartItems.find(item => (item._id || item.id) === productId);
+  const quantity = cartItem ? cartItem.quantity : 0;
+  const openProduct = () => navigate(`/product/${productId}`);
+
   const handleAddToCart = (e) => {
     e.stopPropagation();
     addItem(product);
   };
 
-  const productId = product.id || product._id;
-  const productImage = product.img || product.image;
+  const handleRemoveOne = (e) => {
+    e.stopPropagation();
+    removeItem(productId);
+  };
+
+  const handleCardKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openProduct();
+    }
+  };
 
   return (
     <article 
       ref={tiltRef} 
       className="product-card animate-on-scroll"
-      onClick={() => navigate(`/product/${productId}`)}
+      onClick={openProduct}
+      onKeyDown={handleCardKeyDown}
+      role="link"
+      tabIndex={0}
+      aria-label={`${product.name} details`}
     >
       <div className="product-card-image-wrap">
-        <img
+        <Picture
           src={productImage}
           alt={product.name}
           className="product-card-image"
           loading="lazy"
+          sizes="(max-width: 768px) 100vw, 33vw"
         />
       </div>
 
@@ -80,9 +104,22 @@ export default function ProductCard({ product }) {
           <Button variant="outline" className="product-card-cta">
             Details
           </Button>
-          <Button className="product-card-cta" onClick={handleAddToCart}>
-            Add to Cart
-          </Button>
+          
+          {quantity > 0 ? (
+            <div className="quantity-controls" onClick={(e) => e.stopPropagation()}>
+              <button type="button" className="qty-btn" onClick={handleRemoveOne} aria-label="Decrease quantity">
+                <Minus size={16} />
+              </button>
+              <span className="qty-value">{quantity}</span>
+              <button type="button" className="qty-btn" onClick={handleAddToCart} aria-label="Increase quantity">
+                <Plus size={16} />
+              </button>
+            </div>
+          ) : (
+            <Button className="product-card-cta" onClick={handleAddToCart}>
+              Add to Cart
+            </Button>
+          )}
         </div>
       </div>
     </article>

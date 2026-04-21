@@ -8,7 +8,7 @@ VALUES
     'Developed for high-intensity training sessions with durable flight characteristics.',
     1500,
     'https://images.unsplash.com/photo-1626225453014-49774309ba83?q=80&w=800&auto=format&fit=crop',
-    '{"feathers":"Grade B Goose Feather","speed":"77/78","durability":"High","stability":"Consistent"}'::jsonb
+    '{"feathers":"Grade B Goose Feather","speed":"76/77","durability":"High","stability":"Consistent"}'::jsonb
   ),
   (
     'AER-FL-10',
@@ -18,7 +18,7 @@ VALUES
     'Club-grade shuttlecock for competitive sessions with predictable flight path.',
     2000,
     'https://images.unsplash.com/photo-1613919113166-2990050bc83a?q=80&w=800&auto=format&fit=crop',
-    '{"feathers":"Grade A Duck Feather","speed":"77/78","durability":"Professional","stability":"Elite"}'::jsonb
+    '{"feathers":"Grade A Duck Feather","speed":"76/77","durability":"Professional","stability":"Elite"}'::jsonb
   ),
   (
     'AER-FL-15',
@@ -28,7 +28,7 @@ VALUES
     'Premium tournament shuttlecock calibrated for national-level competitive use.',
     2500,
     'https://images.unsplash.com/photo-1599474924187-334a4ae593c0?q=80&w=800&auto=format&fit=crop',
-    '{"feathers":"Grade A+ Goose Feather","speed":"77/78","durability":"Supreme","stability":"Perfect"}'::jsonb
+    '{"feathers":"Grade A+ Goose Feather","speed":"76/77","durability":"Supreme","stability":"Perfect"}'::jsonb
   )
 ON CONFLICT (sku) DO NOTHING;
 

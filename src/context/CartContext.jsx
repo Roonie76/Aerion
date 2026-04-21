@@ -1,13 +1,15 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from './AuthContext';
+import { toGA4Item, trackEvent } from '../lib/analytics';
 
 const CartContext = createContext(undefined);
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+  const [cartAnnouncement, setCartAnnouncement] = useState('');
   const { user, request } = useAuth();
+  const announcementTimeoutRef = useRef(null);
 
-  // Load cart from server or local storage on mount
   useEffect(() => {
     const loadCart = async () => {
       if (user) {
@@ -22,50 +24,90 @@ export function CartProvider({ children }) {
         }
       }
     };
+
     loadCart();
   }, [user, request]);
 
-  // Sync cart to local storage (if guest)
   useEffect(() => {
     if (!user) {
       localStorage.setItem('aerion_cart', JSON.stringify(cartItems));
     }
   }, [cartItems, user]);
 
+  useEffect(() => {
+    return () => {
+      if (announcementTimeoutRef.current) {
+        window.clearTimeout(announcementTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const announce = (message) => {
+    setCartAnnouncement('');
+    window.requestAnimationFrame(() => setCartAnnouncement(message));
+
+    if (announcementTimeoutRef.current) {
+      window.clearTimeout(announcementTimeoutRef.current);
+    }
+
+    announcementTimeoutRef.current = window.setTimeout(() => {
+      setCartAnnouncement('');
+    }, 1200);
+  };
+
   const addItem = async (item) => {
-    const existingItem = cartItems.find((cartItem) => cartItem.id === item.id || cartItem._id === item._id);
-    let newItems;
+    const itemId = item._id || item.id;
+    if (!itemId) return;
+
+    const existingItem = cartItems.find((cartItem) => (cartItem._id || cartItem.id) === itemId);
+    let nextItems;
 
     if (!existingItem) {
-      newItems = [...cartItems, { ...item, quantity: 1 }];
+      nextItems = [...cartItems, { ...item, quantity: 1 }];
     } else {
-      newItems = cartItems.map((cartItem) =>
-        (cartItem.id === item.id || cartItem._id === item._id) 
-          ? { ...cartItem, quantity: cartItem.quantity + 1 } 
+      nextItems = cartItems.map((cartItem) =>
+        (cartItem._id || cartItem.id) === itemId
+          ? { ...cartItem, quantity: cartItem.quantity + 1 }
           : cartItem
       );
     }
 
-    setCartItems(newItems);
+    setCartItems(nextItems);
+    announce('Added to cart.');
+    trackEvent('add_to_cart', {
+      currency: 'INR',
+      value: Number(item.price) || 0,
+      items: [toGA4Item(item)],
+    });
 
     if (user) {
       await request('/cart/add', {
         method: 'POST',
-        body: JSON.stringify({ productId: item._id || item.id, quantity: 1 }),
+        body: JSON.stringify({ productId: itemId, quantity: 1 }),
       });
     }
   };
 
   const removeItem = async (itemId) => {
-    const newItems = cartItems
+    if (!itemId) return;
+    const existingItem = cartItems.find((cartItem) => (cartItem._id || cartItem.id) === itemId);
+
+    const nextItems = cartItems
       .map((cartItem) =>
-        (cartItem.id === itemId || cartItem._id === itemId) 
-          ? { ...cartItem, quantity: cartItem.quantity - 1 } 
+        (cartItem._id || cartItem.id) === itemId
+          ? { ...cartItem, quantity: cartItem.quantity - 1 }
           : cartItem
       )
       .filter((cartItem) => cartItem.quantity > 0);
 
-    setCartItems(newItems);
+    setCartItems(nextItems);
+    if (existingItem) {
+      trackEvent('remove_from_cart', {
+        currency: 'INR',
+        value: Number(existingItem.price) || 0,
+        items: [toGA4Item(existingItem)],
+      });
+    }
 
     if (user) {
       await request('/cart/remove', {
@@ -76,7 +118,17 @@ export function CartProvider({ children }) {
   };
 
   const deleteItem = async (itemId) => {
-    setCartItems((prevItems) => prevItems.filter((cartItem) => cartItem.id !== itemId && cartItem._id !== itemId));
+    if (!itemId) return;
+    const existingItem = cartItems.find((cartItem) => (cartItem._id || cartItem.id) === itemId);
+
+    setCartItems((current) => current.filter((cartItem) => (cartItem._id || cartItem.id) !== itemId));
+    if (existingItem) {
+      trackEvent('remove_from_cart', {
+        currency: 'INR',
+        value: (Number(existingItem.price) || 0) * (existingItem.quantity || 1),
+        items: [toGA4Item(existingItem, existingItem.quantity || 1)],
+      });
+    }
 
     if (user) {
       await request(`/cart/${itemId}`, { method: 'DELETE' });
@@ -86,6 +138,7 @@ export function CartProvider({ children }) {
   const clearCart = async () => {
     setCartItems([]);
     localStorage.removeItem('aerion_cart');
+
     if (user) {
       await request('/cart', { method: 'DELETE' });
     }
@@ -94,12 +147,13 @@ export function CartProvider({ children }) {
   const value = useMemo(
     () => ({
       cartItems,
+      cartAnnouncement,
       addItem,
       removeItem,
       deleteItem,
       clearCart,
     }),
-    [cartItems, user, request]
+    [cartAnnouncement, cartItems, user, request]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

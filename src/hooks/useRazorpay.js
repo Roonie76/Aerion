@@ -50,7 +50,7 @@ export function useRazorpay() {
         description: 'Elite Badminton Shuttlecocks',
         order_id: providerOrder.id,
         prefill: {
-          name: checkoutData?.fullName,
+          name: checkoutData?.fullName || checkoutData?.name || checkoutData?.recipientName,
           email: checkoutData?.email,
           contact: checkoutData?.phone,
         },

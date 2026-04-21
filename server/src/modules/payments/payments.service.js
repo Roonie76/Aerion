@@ -7,7 +7,7 @@ import { randomId, signHmacSha256 } from '../../shared/utils/crypto.js';
 import { PAYMENT_STATUS, ORDER_STATUS } from '../../shared/utils/orderStateMachine.js';
 import { getRazorpayClient, isRazorpayConfigured } from '../../shared/integrations/razorpayClient.js';
 import { consumeOrderReservations } from '../inventory/inventory.service.js';
-import { addOrderHistory, getOrderForUpdate, updateOrder } from '../orders/orders.repository.js';
+import { addOrderHistory, getOrderForUpdate, getOrderItems, updateOrder } from '../orders/orders.repository.js';
 import {
   countAttemptsForOrder,
   createPaymentAttempt,
@@ -49,6 +49,8 @@ async function finalizeSuccessfulPayment(client, attempt, providerPaymentId, res
     note: 'Payment confirmed',
   });
 
+  const items = await getOrderItems(order.id, client);
+
   await addOutboxEvent(client, {
     aggregateType: 'order',
     aggregateId: order.id,
@@ -57,8 +59,22 @@ async function finalizeSuccessfulPayment(client, attempt, providerPaymentId, res
       orderId: order.id,
       orderNumber: order.orderNumber,
       customerEmail: order.customerEmail,
+      customerName: order.customerName || null,
       amount: order.totalAmount,
+      subtotalAmount: order.subtotalAmount,
+      discountAmount: order.discountAmount,
+      shippingAmount: order.shippingAmount,
+      taxAmount: order.taxAmount,
+      totalAmount: order.totalAmount,
       currency: order.currency,
+      providerPaymentId,
+      items: items.map((it) => ({
+        name: it.name,
+        quantity: it.quantity,
+        unitPrice: it.unitPrice,
+        lineTotal: it.lineTotal,
+      })),
+      shippingAddress: order.shippingAddress || null,
     },
   });
 

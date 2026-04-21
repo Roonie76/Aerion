@@ -2,66 +2,232 @@ import React, { useMemo, useState, useEffect, memo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart, useAuth } from '../context';
 import { useRazorpay } from '../hooks/useRazorpay';
+import { toGA4Item, trackEvent } from '../lib/analytics';
+import {
+  isEmail,
+  isIndianPhone,
+  isNonEmpty,
+  isPincode,
+  validate,
+} from '../utils/validation';
 
-const TAX_RATE = 0.12;
+const TAX_RATE = 0.18;
 
-/* ─── Memoized Checkout Form ─────────────────────────────── */
+const checkoutSchema = {
+  name: [{ test: isNonEmpty, message: 'Enter the recipient name.' }],
+  email: [
+    { test: isNonEmpty, message: 'Enter your email address.' },
+    { test: isEmail, message: 'Enter a valid email address.' },
+  ],
+  phone: [
+    { test: isNonEmpty, message: 'Enter your phone number.' },
+    { test: isIndianPhone, message: 'Enter a valid 10-digit Indian mobile number.' },
+  ],
+  line1: [{ test: isNonEmpty, message: 'Enter your street address.' }],
+  city: [{ test: isNonEmpty, message: 'Enter your city.' }],
+  state: [{ test: isNonEmpty, message: 'Enter your state.' }],
+  pincode: [
+    { test: isNonEmpty, message: 'Enter your pincode.' },
+    { test: isPincode, message: 'Enter a valid 6-digit Indian pincode.' },
+  ],
+};
+
+const fieldGridStyle = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+  gap: '16px',
+};
+
+const paymentFieldsetStyle = {
+  border: '1px solid var(--border)',
+  padding: '16px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+};
+
+const paymentOptionStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  color: 'var(--text-secondary)',
+  fontSize: '0.85rem',
+  cursor: 'pointer',
+};
+
 const CheckoutForm = memo(function CheckoutForm({ user, loading, error, onSubmit }) {
   const [data, setData] = useState({
-    fullName: user?.name || '',
+    name: user?.name || '',
     email: user?.email || '',
     phone: '',
-    address: '',
+    line1: '',
+    city: '',
+    state: '',
+    pincode: '',
     paymentMethod: 'card',
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (user) {
-      setData((prev) => ({ ...prev, fullName: user.name, email: user.email }));
+      setData((current) => ({ ...current, name: user.name || '', email: user.email || '' }));
     }
   }, [user]);
 
   const onChange = useCallback((e) => {
     const { name, value } = e.target;
-    setData((prev) => ({ ...prev, [name]: value }));
+    setData((current) => ({ ...current, [name]: value }));
+    setErrors((current) => ({ ...current, [name]: undefined }));
   }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(data);
-  };
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      const nextValidation = validate(data, checkoutSchema);
+      if (!nextValidation.ok) {
+        setErrors(nextValidation.errors);
+        return;
+      }
+
+      onSubmit(data);
+    },
+    [data, onSubmit]
+  );
 
   return (
-    <form className="lu-form" onSubmit={handleSubmit}>
+    <form className="lu-form" onSubmit={handleSubmit} noValidate>
       {error && <div className="lu-form-error" role="alert">{error}</div>}
 
-      <div className="lu-form-group">
-        <label className="lu-form-label" htmlFor="fullName">Full Name</label>
-        <input id="fullName" name="fullName" required className="lu-input" value={data.fullName} onChange={onChange} autoComplete="name" />
+      <div style={fieldGridStyle}>
+        <div className="lu-form-group">
+          <label className="lu-form-label" htmlFor="checkout-name">Full Name</label>
+          <input
+            id="checkout-name"
+            name="name"
+            required
+            className="lu-input"
+            value={data.name}
+            onChange={onChange}
+            autoComplete="name"
+            aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? 'checkout-name-error' : undefined}
+          />
+          {errors.name && <span id="checkout-name-error" role="alert" className="form-error">{errors.name}</span>}
+        </div>
+
+        <div className="lu-form-group">
+          <label className="lu-form-label" htmlFor="checkout-email">Email</label>
+          <input
+            id="checkout-email"
+            name="email"
+            type="email"
+            required
+            className="lu-input"
+            value={data.email}
+            onChange={onChange}
+            autoComplete="email"
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? 'checkout-email-error' : undefined}
+          />
+          {errors.email && <span id="checkout-email-error" role="alert" className="form-error">{errors.email}</span>}
+        </div>
       </div>
 
       <div className="lu-form-group">
-        <label className="lu-form-label" htmlFor="email">Email</label>
-        <input id="email" name="email" type="email" required className="lu-input" value={data.email} onChange={onChange} autoComplete="email" />
+        <label className="lu-form-label" htmlFor="checkout-phone">Phone</label>
+        <input
+          id="checkout-phone"
+          name="phone"
+          type="tel"
+          required
+          className="lu-input"
+          value={data.phone}
+          onChange={onChange}
+          autoComplete="tel"
+          placeholder="+91 98765 43210"
+          aria-invalid={Boolean(errors.phone)}
+          aria-describedby={errors.phone ? 'checkout-phone-error' : undefined}
+        />
+        {errors.phone && <span id="checkout-phone-error" role="alert" className="form-error">{errors.phone}</span>}
       </div>
 
       <div className="lu-form-group">
-        <label className="lu-form-label" htmlFor="phone">Phone</label>
-        <input id="phone" name="phone" required className="lu-input" value={data.phone} onChange={onChange} autoComplete="tel" placeholder="+91 00000 00000" />
+        <label className="lu-form-label" htmlFor="checkout-line1">Address Line 1</label>
+        <input
+          id="checkout-line1"
+          name="line1"
+          required
+          className="lu-input"
+          value={data.line1}
+          onChange={onChange}
+          autoComplete="address-line1"
+          placeholder="Street address, locality, landmark"
+          aria-invalid={Boolean(errors.line1)}
+          aria-describedby={errors.line1 ? 'checkout-line1-error' : undefined}
+        />
+        {errors.line1 && <span id="checkout-line1-error" role="alert" className="form-error">{errors.line1}</span>}
       </div>
 
-      <div className="lu-form-group">
-        <label className="lu-form-label" htmlFor="address">Shipping Address</label>
-        <textarea id="address" name="address" required className="lu-input" value={data.address} onChange={onChange} rows="3" autoComplete="street-address" style={{ resize: 'vertical' }} />
+      <div style={fieldGridStyle}>
+        <div className="lu-form-group">
+          <label className="lu-form-label" htmlFor="checkout-city">City</label>
+          <input
+            id="checkout-city"
+            name="city"
+            required
+            className="lu-input"
+            value={data.city}
+            onChange={onChange}
+            autoComplete="address-level2"
+            aria-invalid={Boolean(errors.city)}
+            aria-describedby={errors.city ? 'checkout-city-error' : undefined}
+          />
+          {errors.city && <span id="checkout-city-error" role="alert" className="form-error">{errors.city}</span>}
+        </div>
+
+        <div className="lu-form-group">
+          <label className="lu-form-label" htmlFor="checkout-state">State</label>
+          <input
+            id="checkout-state"
+            name="state"
+            required
+            className="lu-input"
+            value={data.state}
+            onChange={onChange}
+            autoComplete="address-level1"
+            aria-invalid={Boolean(errors.state)}
+            aria-describedby={errors.state ? 'checkout-state-error' : undefined}
+          />
+          {errors.state && <span id="checkout-state-error" role="alert" className="form-error">{errors.state}</span>}
+        </div>
+
+        <div className="lu-form-group">
+          <label className="lu-form-label" htmlFor="checkout-pincode">Pincode</label>
+          <input
+            id="checkout-pincode"
+            name="pincode"
+            required
+            className="lu-input"
+            value={data.pincode}
+            onChange={onChange}
+            autoComplete="postal-code"
+            inputMode="numeric"
+            placeholder="122001"
+            aria-invalid={Boolean(errors.pincode)}
+            aria-describedby={errors.pincode ? 'checkout-pincode-error' : undefined}
+          />
+          {errors.pincode && <span id="checkout-pincode-error" role="alert" className="form-error">{errors.pincode}</span>}
+        </div>
       </div>
 
-      <fieldset style={{ border: '1px solid var(--border)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <fieldset style={paymentFieldsetStyle}>
         <legend className="lu-form-label">Payment Method</legend>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-secondary)', fontSize: '0.85rem', cursor: 'pointer' }}>
+        <label style={paymentOptionStyle}>
           <input type="radio" name="paymentMethod" value="card" checked={data.paymentMethod === 'card'} onChange={onChange} style={{ accentColor: 'var(--primary)' }} />
           Card / UPI (Razorpay)
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-secondary)', fontSize: '0.85rem', cursor: 'pointer' }}>
+        <label style={paymentOptionStyle}>
           <input type="radio" name="paymentMethod" value="cod" checked={data.paymentMethod === 'cod'} onChange={onChange} style={{ accentColor: 'var(--primary)' }} />
           Cash on Delivery
         </label>
@@ -73,45 +239,78 @@ const CheckoutForm = memo(function CheckoutForm({ user, loading, error, onSubmit
         disabled={loading}
         style={{ width: '100%', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}
       >
-        {loading ? 'Processing…' : 'Place Order'}
+        {loading ? 'Processing...' : 'Place Order'}
       </button>
     </form>
   );
 });
 
-/* ─── Main Cart Component ─────────────────────────────────── */
 export default function Cart() {
   const navigate = useNavigate();
   const { cartItems, addItem, removeItem, deleteItem, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, request } = useAuth();
   const { initiatePayment } = useRazorpay();
 
   const [isPlaced, setIsPlaced] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const beginCheckoutTrackedRef = React.useRef(false);
 
   const { subtotal, taxes, totalItems, grandTotal } = useMemo(() => {
-    const sub = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
+    const sub = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const tax = Math.round(sub * TAX_RATE);
-    return { subtotal: sub, taxes: tax, totalItems: cartItems.reduce((s, i) => s + i.quantity, 0), grandTotal: sub + tax };
+    return {
+      subtotal: sub,
+      taxes: tax,
+      totalItems: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+      grandTotal: sub + tax,
+    };
   }, [cartItems]);
 
   const onCheckout = async (checkoutData) => {
     setError('');
-    if (!user) { navigate('/login?redirect=cart'); return; }
-    if (cartItems.length === 0) return;
+
+    if (!user) {
+      navigate('/login?redirect=cart');
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      return;
+    }
+
+    const gaItems = cartItems.map((item) => toGA4Item(item, item.quantity || 1));
+    const analyticsBase = {
+      currency: 'INR',
+      value: grandTotal,
+      items: gaItems,
+    };
+
+    if (!beginCheckoutTrackedRef.current) {
+      trackEvent('begin_checkout', analyticsBase);
+      beginCheckoutTrackedRef.current = true;
+    }
+
+    trackEvent('add_shipping_info', {
+      ...analyticsBase,
+      shipping_tier: 'Standard',
+    });
+
     setLoading(true);
 
     try {
-      // 1. Create the base order first
       const orderRes = await request('/orders', {
         method: 'POST',
         body: JSON.stringify({
           shippingAddress: {
-            fullName: checkoutData.fullName,
-            email: checkoutData.email,
+            label: 'checkout',
+            recipientName: checkoutData.name,
             phone: checkoutData.phone,
-            address: checkoutData.address,
+            line1: checkoutData.line1,
+            city: checkoutData.city,
+            state: checkoutData.state,
+            postalCode: checkoutData.pincode,
+            country: 'India',
           },
           paymentMethod: checkoutData.paymentMethod,
         }),
@@ -123,30 +322,45 @@ export default function Cart() {
 
       const orderId = orderRes.data.id;
 
-      // 2. If Cash on Delivery, fast-track to success
       if (checkoutData.paymentMethod === 'cod') {
         setIsPlaced(true);
-        clearCart();
+        await clearCart();
         setLoading(false);
         return;
       }
 
-      // 3. For card transactions, request intent tracking via the orderId
+      trackEvent('add_payment_info', {
+        ...analyticsBase,
+        payment_type: 'Razorpay',
+      });
+
       await initiatePayment({
         orderId,
         checkoutData,
-        onSuccess: () => {
+        analyticsContext: {
+          ...analyticsBase,
+          payment_type: 'Razorpay',
+        },
+        onSuccess: async () => {
+          trackEvent('purchase', {
+            transaction_id: orderId,
+            currency: 'INR',
+            value: grandTotal,
+            tax: taxes,
+            shipping: 0,
+            items: gaItems,
+          });
           setIsPlaced(true);
-          clearCart();
+          await clearCart();
           setLoading(false);
         },
-        onFailure: (msg) => {
-          setError(msg);
+        onFailure: (message) => {
+          setError(message);
           setLoading(false);
         },
       });
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Unable to place your order right now.');
       setLoading(false);
     }
   };
@@ -185,9 +399,8 @@ export default function Cart() {
           </div>
         ) : (
           <div className="lu-cart-layout">
-            {/* Cart Items */}
             <section className="lu-cart-panel" aria-label="Cart Items">
-              <p className="lu-cart-title">Order Items — {totalItems}</p>
+              <p className="lu-cart-title">Order Items - {totalItems}</p>
               {cartItems.map((item) => (
                 <article key={item.id || item._id} className="lu-cart-item">
                   <img src={item.img || item.image} alt={item.name} className="lu-cart-item-img" loading="lazy" />
@@ -201,9 +414,9 @@ export default function Cart() {
                     </div>
                     <div className="lu-cart-item-actions">
                       <div className="lu-qty-controls">
-                        <button className="lu-qty-btn" type="button" onClick={() => removeItem(item.id || item._id)} aria-label="Decrease">−</button>
+                        <button className="lu-qty-btn" type="button" onClick={() => removeItem(item.id || item._id)} aria-label="Decrease quantity">-</button>
                         <span className="lu-qty-count">{item.quantity}</span>
-                        <button className="lu-qty-btn" type="button" onClick={() => addItem(item)} aria-label="Increase">+</button>
+                        <button className="lu-qty-btn" type="button" onClick={() => addItem(item)} aria-label="Increase quantity">+</button>
                       </div>
                       <button className="lu-cart-remove" type="button" onClick={() => deleteItem(item.id || item._id)}>Remove</button>
                     </div>
@@ -212,14 +425,13 @@ export default function Cart() {
               ))}
             </section>
 
-            {/* Checkout Panel */}
             <aside className="lu-cart-panel" aria-label="Checkout">
               <p className="lu-cart-title">Checkout</p>
 
               <div className="lu-totals" style={{ marginBottom: '28px' }}>
                 <div className="lu-totals-row"><span>Subtotal</span><span>₹{subtotal}</span></div>
-                <div className="lu-totals-row"><span>GST (12%)</span><span>₹{taxes}</span></div>
-                <div className="lu-totals-row grand"><span>Total</span><strong>₹{grandTotal}</strong></div>
+                <div className="lu-totals-row"><span>GST (18%)</span><span>₹{taxes}</span></div>
+                <div className="lu-totals-row grand" role="status" aria-live="polite" aria-atomic="true"><span>Total</span><strong>₹{grandTotal}</strong></div>
               </div>
 
               <CheckoutForm user={user} loading={loading} error={error} onSubmit={onCheckout} />

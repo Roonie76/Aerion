@@ -7,3 +7,8 @@ export { default as Cart } from './Cart';
 export { default as Login } from './Login';
 export { default as Register } from './Register';
 export { default as Account } from './Account';
+export { default as NotFound } from './NotFound';
+export { default as Privacy } from './Privacy';
+export { default as Terms } from './Terms';
+export { default as RefundPolicy } from './RefundPolicy';
+export { default as ShippingPolicy } from './ShippingPolicy';

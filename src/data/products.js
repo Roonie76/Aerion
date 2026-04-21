@@ -5,7 +5,7 @@ export const PRODUCTS = [
     series: 'Training Series',
     price: 1500,
     feathers: 'Grade B Goose Feather',
-    speed: '77/78',
+    speed: '76/77',
     durability: 'High',
     stability: 'Consistent',
     description:
@@ -16,7 +16,7 @@ export const PRODUCTS = [
       'Optimized for Repetitive Drills',
       'Weather Resistant',
     ],
-    img: 'https://images.unsplash.com/photo-1626225453014-49774309ba83?q=80&w=800&auto=format&fit=crop',
+    img: '/images/products/fl-05.jpg',
   },
   {
     id: 'fl-10',
@@ -24,7 +24,7 @@ export const PRODUCTS = [
     series: 'Club Series',
     price: 2000,
     feathers: 'Grade A Duck Feather',
-    speed: '77/78',
+    speed: '76/77',
     durability: 'Professional',
     stability: 'Elite',
     description:
@@ -35,7 +35,7 @@ export const PRODUCTS = [
       'Predictable Flight Path',
       'Standardized Speed Calibration',
     ],
-    img: 'https://images.unsplash.com/photo-1613919113166-2990050bc83a?q=80&w=800&auto=format&fit=crop',
+    img: '/images/products/fl-10.jpg',
   },
   {
     id: 'fl-15',
@@ -43,7 +43,7 @@ export const PRODUCTS = [
     series: 'Tournament Series',
     price: 2500,
     feathers: 'Grade A+ Goose Feather',
-    speed: '77/78',
+    speed: '76/77',
     durability: 'Supreme',
     stability: 'Perfect',
     description:
@@ -54,6 +54,6 @@ export const PRODUCTS = [
       'International Tournament Approved',
       '18-Point Flight Calibration',
     ],
-    img: 'https://images.unsplash.com/photo-1599474924187-334a4ae593c0?q=80&w=800&auto=format&fit=crop',
+    img: '/images/products/fl-15.jpg',
   },
 ];

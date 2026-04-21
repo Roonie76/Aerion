@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /cart
+Disallow: /account
+Disallow: /orders
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://aerionsports.com/sitemap.xml

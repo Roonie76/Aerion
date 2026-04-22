@@ -85,7 +85,7 @@ export default function Privacy() {
       <p>
         Aerion Sports, Sector 92, Gurgaon, India.<br />
         Email: <a href="mailto:aerionsports@gmail.com">aerionsports@gmail.com</a><br />
-        Phone: +91 99112 25445
+        Phone: +91 99xxxxxx45
       </p>
     </LegalPage>
   );

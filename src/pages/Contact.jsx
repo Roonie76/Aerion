@@ -75,7 +75,7 @@ export default function Contact() {
           <p className="lu-section-sub">For professional partnerships, procurement, or product queries, we are at your command.</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '64px', marginTop: '64px' }} className="responsive-contact">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 'clamp(32px, 5vw, 64px)', marginTop: 'clamp(32px, 5vw, 64px)' }} className="responsive-contact">
           <aside>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
               <div style={{ display: 'flex', gap: '20px' }}>
@@ -109,7 +109,7 @@ export default function Contact() {
               </div>
             </div>
 
-            <div style={{ marginTop: '56px', padding: '32px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
+            <div style={{ marginTop: '40px', padding: 'clamp(20px, 4vw, 32px)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.8 }}>
                 "AERION isn't just equipment; it's a standard of excellence. Our technical team is available for deep-dive flight diagnostics and club-level consultancy."
               </p>
@@ -119,7 +119,7 @@ export default function Contact() {
 
           <main>
             {success ? (
-              <div style={{ background: 'rgba(74, 222, 128, 0.05)', border: '1px solid #4ade80', padding: '48px', textAlign: 'center' }}>
+              <div style={{ background: 'rgba(74, 222, 128, 0.05)', border: '1px solid #4ade80', padding: 'clamp(24px, 5vw, 48px)', textAlign: 'center' }}>
                 <div style={{ width: '64px', height: '64px', border: '2px solid #4ade80', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4ade80', margin: '0 auto 24px' }}>
                   <Send size={24} />
                 </div>
@@ -128,7 +128,7 @@ export default function Contact() {
                 <button type="button" onClick={() => setSuccess(false)} className="lu-btn-ghost" style={{ marginTop: '24px' }}>Send Another</button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="lu-form" noValidate style={{ padding: '40px', background: 'var(--card)', border: '1px solid var(--border)' }}>
+              <form onSubmit={handleSubmit} className="lu-form" noValidate style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--card)', border: '1px solid var(--border)' }}>
                 {error && <div className="lu-form-error" role="alert" style={{ marginBottom: '24px' }}>{error}</div>}
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '24px' }}>

@@ -211,16 +211,16 @@ function TestimonialsSection() {
 
         <div className="aerion-testimonials-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           gap: '24px',
-          marginTop: '64px',
+          marginTop: 'clamp(32px, 5vw, 64px)',
         }}>
           {TESTIMONIALS.map((t, i) => {
             const ref = useFadeIn(0.1);
             return (
               <blockquote key={t.author} ref={ref} className="lu-fade-up" style={{
                 position: 'relative',
-                padding: '40px 32px',
+                padding: 'clamp(24px, 4vw, 40px) clamp(20px, 4vw, 32px)',
                 background: 'linear-gradient(145deg, rgba(255,255,255,0.025) 0%, rgba(0,0,0,0.45) 100%)',
                 border: '1px solid rgba(201,168,76,0.15)',
                 transitionDelay: `${i * 100}ms`,
@@ -300,7 +300,7 @@ function NewsletterSection() {
 
             <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <label htmlFor="home-newsletter-email" className="sr-only">Email address</label>
-              <div style={{
+              <div className="aerion-newsletter-inputrow" style={{
                 display: 'flex',
                 border: '1px solid rgba(201,168,76,0.35)',
                 background: 'rgba(0,0,0,0.4)',
@@ -335,6 +335,10 @@ function NewsletterSection() {
           <style>{`
             @media (max-width: 768px) {
               .aerion-newsletter-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+            }
+            @media (max-width: 480px) {
+              .aerion-newsletter-inputrow { flex-direction: column !important; }
+              .aerion-newsletter-inputrow button { width: 100% !important; padding: 16px !important; }
             }
           `}</style>
         </div>

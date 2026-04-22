@@ -13,16 +13,16 @@ const FILTERS = ['All', 'Professional', 'Intermediate', 'Training'];
 const S = {
   hero: {
     position: 'relative',
-    padding: '140px clamp(24px, 5vw, 64px) 72px',
+    padding: 'clamp(96px, 14vw, 140px) clamp(20px, 5vw, 64px) clamp(48px, 8vw, 72px)',
     background: 'radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.08) 0%, transparent 50%), linear-gradient(180deg, #070708 0%, #030303 100%)',
     borderBottom: '1px solid rgba(201,168,76,0.15)',
     overflow: 'hidden',
   },
   heroInner: { maxWidth: '1400px', margin: '0 auto' },
   crumbs: {
-    display: 'flex', gap: '10px',
+    display: 'flex', gap: '10px', flexWrap: 'wrap',
     fontSize: '0.7rem', letterSpacing: '0.22em', textTransform: 'uppercase',
-    color: 'rgba(240,237,232,0.5)', marginBottom: '40px',
+    color: 'rgba(240,237,232,0.5)', marginBottom: 'clamp(24px, 4vw, 40px)',
   },
   crumbLink: { color: '#c9a84c', textDecoration: 'none' },
   heroLayout: {
@@ -62,12 +62,12 @@ const S = {
     color: '#c9a84c', marginTop: '8px',
   },
   toolbar: {
-    position: 'sticky', top: '72px', zIndex: 40,
+    position: 'sticky', top: '64px', zIndex: 40,
     background: 'linear-gradient(180deg, rgba(3,3,3,0.95) 0%, rgba(3,3,3,0.85) 100%)',
     backdropFilter: 'blur(10px)',
     borderBottom: '1px solid rgba(255,255,255,0.06)',
-    padding: '20px clamp(24px, 5vw, 64px)',
-    marginBottom: '48px',
+    padding: 'clamp(14px, 3vw, 20px) clamp(16px, 5vw, 64px)',
+    marginBottom: 'clamp(28px, 5vw, 48px)',
   },
   toolbarInner: {
     maxWidth: '1400px', margin: '0 auto',
@@ -105,6 +105,7 @@ const S = {
     border: '1px solid rgba(255,255,255,0.1)',
     color: '#f0ede8', fontSize: '0.78rem', letterSpacing: '0.08em',
     cursor: 'pointer', outline: 'none', fontFamily: 'inherit',
+    maxWidth: '100%',
   },
   resultCount: {
     fontSize: '0.72rem', letterSpacing: '0.25em', textTransform: 'uppercase',
@@ -112,7 +113,7 @@ const S = {
   },
   content: {
     maxWidth: '1400px', margin: '0 auto',
-    padding: '0 clamp(24px, 5vw, 64px) 120px',
+    padding: '0 clamp(16px, 5vw, 64px) clamp(64px, 12vw, 120px)',
   },
 };
 
@@ -233,10 +234,13 @@ export default function Series() {
           @media (max-width: 900px) {
             .aerion-series-hero {
               grid-template-columns: 1fr !important;
-              gap: 48px !important;
+              gap: 36px !important;
             }
             .aerion-series-hero > div:last-child { justify-content: flex-start !important; }
             .aerion-series-hero > div:last-child > div { text-align: left !important; }
+          }
+          @media (max-width: 640px) {
+            .aerion-series-hero > div:last-child { gap: 20px !important; }
           }
         `}</style>
       </section>

@@ -38,3 +38,32 @@
 All seven H-series items are shipped. If any regression surfaces, the most likely suspect areas are:
 1. GA4 events in production — verify in GA4 DebugView that `page_view → view_item → add_to_cart → begin_checkout → add_shipping_info → add_payment_info → purchase` fires in order on a real checkout.
 2. Bundle splitting to drop below the 500 kB warning (route-level `React.lazy()` on Cart/ProductDetail/Account would be the biggest wins).
+
+## 2026-04-22 — Returns/Cancel workflow, Phases 1 & 3
+
+### Completed
+- **Phase 1 (DB)** — idempotent migration at `server/sql/migrations/001_order_requests.sql`. Adapted spec's SERIAL/INT to project's UUID + TIMESTAMPTZ conventions. Creates `req_type`/`req_status` enums + `order_requests` table + indexes. Must still be run: `psql "$DATABASE_URL" -f server/sql/migrations/001_order_requests.sql`.
+- **Phase 3 (backend module)** — `server/src/modules/returns/` with `returns.llm.js` (stub), `returns.repository.js`, `returns.service.js`, `returns.controller.js`, `returns.routes.js`. Wired into `server/src/app/routes.js` at `/api/returns`. All pass `node --check`.
+- Endpoints: `POST /api/returns/request` (protected), `GET /api/returns/admin?status=…` (protected + admin).
+
+### Divergences from user's spec (intentional adaptations)
+- Project is ESM (`"type":"module"`) — all files use `import`/`export`, not `require`/`module.exports`.
+- Pool import: `../../shared/db/index.js` named `{ pool }`, not `../../config/db`.
+- Auth middleware: `{ protect, adminOnly }` from `../../middleware/authMiddleware.js` (local JWT cookies — NOT Firebase as spec implied). Frontend must send `credentials: 'include'`, not bearer tokens.
+- Email: `../../shared/integrations/emailService.js`, not `../../services/email.service`.
+- **`orders.order_status` does not exist** — schema column is `orders.status`. Repo uses `status` + aliases it as `order_status` in the admin list SELECT to keep the response shape spec-compatible.
+- `delivered_at` is NOT a column on `orders` — derived via subquery from `order_status_history` (latest row where `to_status='delivered'`).
+- `updateOrderStatus()` also inserts into `order_status_history` to match project pattern.
+- Added `checkPendingRequest()` (service calls it; spec omitted the repo definition).
+- Service throws errors with `statusCode` so the project's `errorHandler` maps them correctly.
+
+### Open questions / blockers
+- **Phase 2 LLM (Ollama) not yet written.** `returns.llm.js` is a stub that always returns `INFO_NEEDED`. Full Ollama-backed `decide()` from user's Phase 2 message is pending — needs ESM conversion and should stay at `server/src/modules/returns/returns.llm.js` (not in a top-level `services/` dir, which doesn't exist).
+- **Phase 4 frontend (`OrderRequestForm.jsx`) not yet written.** Frontend auth uses cookie sessions (`credentials: 'include'`), not `Authorization: Bearer`. Spec's `getFirebaseToken()` call is wrong for this repo.
+- **Phase 5 (Cowork automation)** is runtime ops, not code — no files to write.
+- Migration has not been run against the user's DB yet. Backend will 500 on any `/api/returns/*` call until it is.
+
+### Next recommended step
+1. Run the migration: `psql "$DATABASE_URL" -f server/sql/migrations/001_order_requests.sql`.
+2. Phase 2: port the Ollama `decide()` from the user's spec into `returns.llm.js` (ESM, use `order.status`/derived `delivered_at` instead of `order.order_status`/`order.delivered_at`).
+3. Phase 4: frontend form — use `fetch('/api/returns/request', { credentials: 'include', ... })`, no bearer token.

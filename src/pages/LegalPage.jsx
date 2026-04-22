@@ -1,8 +1,8 @@
 import React from 'react';
 
 const S = {
-  page: { minHeight: '70vh', padding: '120px 0 80px' },
-  container: { maxWidth: '860px', margin: '0 auto', padding: '0 clamp(24px, 5vw, 48px)' },
+  page: { minHeight: '70vh', padding: 'clamp(88px, 14vw, 120px) 0 clamp(48px, 8vw, 80px)' },
+  container: { maxWidth: '860px', margin: '0 auto', padding: '0 clamp(16px, 5vw, 48px)' },
   overline: {
     fontSize: '0.72rem',
     color: '#c9a84c',

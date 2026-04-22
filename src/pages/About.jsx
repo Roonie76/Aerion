@@ -131,7 +131,7 @@ export default function About() {
         textAlign: 'center',
         overflow: 'hidden',
         background: 'radial-gradient(ellipse 80% 50% at 50% 45%, #121626 0%, #05060a 100%)',
-        paddingTop: '120px',
+        paddingTop: 'clamp(88px, 14vw, 120px)',
       }}>
         {/* Noise texture */}
         <div className="lu-hero-noise" aria-hidden="true" />
@@ -423,7 +423,7 @@ export default function About() {
           CTA — Close the loop
       ═══════════════════════════════════════════ */}
       <section style={{
-        padding: '160px 24px',
+        padding: 'clamp(80px, 14vw, 160px) clamp(20px, 5vw, 24px)',
         textAlign: 'center',
         position: 'relative',
         overflow: 'hidden',

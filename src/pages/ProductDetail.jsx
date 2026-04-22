@@ -14,7 +14,7 @@ import Skeleton from '../components/Skeleton';
 const S = {
   page: {
     minHeight: '100vh',
-    padding: '140px clamp(24px, 5vw, 64px) 120px',
+    padding: 'clamp(96px, 14vw, 140px) clamp(16px, 5vw, 64px) clamp(64px, 12vw, 120px)',
     background: 'radial-gradient(ellipse at 70% 0%, rgba(201,168,76,0.06) 0%, transparent 55%), linear-gradient(180deg, #070708 0%, #030303 100%)',
     color: '#f0ede8',
     fontFamily: "'Inter', system-ui, sans-serif",
@@ -379,7 +379,7 @@ export default function ProductDetail() {
               <div style={S.stageNoise} aria-hidden="true" />
             </div>
 
-            <div style={S.thumbs}>
+            <div className="aerion-pdp-thumbs" style={S.thumbs}>
               {[0, 1, 2].map((i) => (
                 <button key={i} type="button" onClick={() => setActiveImg(i)}
                   style={S.thumb(activeImg === i)} aria-label={'View angle ' + (i + 1)}>
@@ -401,7 +401,7 @@ export default function ProductDetail() {
             <div style={S.stock}><span style={S.stockDot} /> In Stock &middot; Ships Today</div>
             <p style={S.desc}>{product.description}</p>
 
-            <div style={S.specsGrid}>
+            <div className="aerion-pdp-specs" style={S.specsGrid}>
               <div style={S.specItem}>
                 <div style={S.specIcon}><Feather size={16} /></div>
                 <div><div style={S.specLabel}>Feathers</div><div style={S.specValue}>{feathers || 'Grade A'}</div></div>
@@ -457,14 +457,14 @@ export default function ProductDetail() {
               </span>
             </div>
 
-            <div style={S.ctaRow}>
+            <div className="aerion-pdp-ctarow" style={S.ctaRow}>
               <button type="button" style={{ ...S.cta, background: added ? '#4ade80' : '#c9a84c' }} onClick={handleAddToCart}>
                 {added ? (<><Check size={16} /> Added</>) : (<><ShoppingCart size={16} /> Add to Cart</>)}
               </button>
               <button type="button" style={S.ctaGhost} onClick={handleBuyNow}>Buy Now</button>
             </div>
 
-            <div style={S.benefits}>
+            <div className="aerion-pdp-benefits" style={S.benefits}>
               <div style={S.benefit}>
                 <ShieldCheck size={18} style={S.benefitIcon} />
                 <div style={S.benefitTxt}>Secure checkout &middot; SSL &amp; Razorpay</div>
@@ -487,7 +487,7 @@ export default function ProductDetail() {
 
         {related.length > 0 && (
           <section style={S.relatedSection}>
-            <div style={S.relatedHead}>
+            <div className="aerion-pdp-related-head" style={S.relatedHead}>
               <div>
                 <div style={S.relatedOverline}>Complete the Kit</div>
                 <h2 style={S.relatedTitle}>You May Also Like</h2>
@@ -521,6 +521,16 @@ export default function ProductDetail() {
         @media (max-width: 968px) {
           .aerion-pdp-layout { grid-template-columns: 1fr !important; gap: 48px !important; }
           .aerion-pdp-layout > div:first-child { position: static !important; }
+        }
+        @media (max-width: 640px) {
+          .aerion-pdp-specs { grid-template-columns: 1fr !important; gap: 16px !important; padding: 18px !important; }
+          .aerion-pdp-benefits { grid-template-columns: 1fr !important; gap: 14px !important; padding: 16px !important; }
+          .aerion-pdp-ctarow { flex-direction: column !important; }
+          .aerion-pdp-ctarow > button { width: 100% !important; }
+          .aerion-pdp-related-head { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+        }
+        @media (max-width: 480px) {
+          .aerion-pdp-thumbs { gap: 8px !important; }
         }
       `}</style>
     </div>

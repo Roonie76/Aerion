@@ -499,6 +499,54 @@ ul {
   .nav-actions {
     gap: 12px;
   }
+
+  /* On tablet, drop the username text — keep only the avatar bubble */
+  .user-name-short {
+    display: none;
+  }
+
+  .user-menu-trigger {
+    padding: 4px;
+    gap: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  /* On mobile, hide the desktop user pill and the standalone auth pill
+     entirely — the hamburger menu exposes Account / Login / Logout. */
+  .nav-actions .user-dropdown,
+  .nav-actions .auth-pill {
+    display: none;
+  }
+
+  /* Tighten brand spacing so the wordmark never collides with actions */
+  .brand-logo-link {
+    gap: 10px;
+  }
+
+  .brand-image-logo {
+    height: 32px;
+  }
+
+  .brand-text {
+    font-size: 1.15rem;
+    letter-spacing: 4px;
+  }
+
+  .nav-actions {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand-text {
+    font-size: 1rem;
+    letter-spacing: 3px;
+  }
+
+  .brand-image-logo {
+    height: 28px;
+  }
 }
 
 .mobile-panel-overlay {
@@ -3318,5 +3366,350 @@ body.has-custom-cursor * {
   .custom-cursor-dot,
   .custom-cursor-ring {
     display: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   GLOBAL RESPONSIVENESS — prevent horizontal scroll
+══════════════════════════════════════════════ */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+img, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ══════════════════════════════════════════════
+   CARD RESPONSIVENESS — mobile & tablet polish
+══════════════════════════════════════════════ */
+
+/* Tablet: 2-up product grid, comfortable card padding */
+@media (max-width: 1024px) {
+  .product-card-body {
+    padding: 20px;
+  }
+
+  .lu-card-body {
+    padding: 24px 24px 28px;
+  }
+
+  .stat-card {
+    padding: 24px;
+    min-height: 150px;
+  }
+}
+
+/* Mobile: single-column grids, tighter interiors, stacked actions */
+@media (max-width: 768px) {
+  /* Force single-col for every product/feature/card grid */
+  .product-grid,
+  .lu-products-grid,
+  .lu-features-grid,
+  .stat-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  /* Product card interior */
+  .product-card-body {
+    padding: 18px;
+  }
+
+  .product-card-headline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .product-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .product-price {
+    font-size: 1.3rem;
+  }
+
+  .product-description {
+    font-size: 0.9rem;
+    min-height: 0;
+    margin-top: 8px;
+  }
+
+  .product-card-actions {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .quantity-controls {
+    height: 44px;
+  }
+
+  /* Neutralize the 3D tilt translateZ so cards don't look offset */
+  .product-card {
+    transform-style: flat;
+  }
+
+  .product-card-body,
+  .product-card-image-wrap {
+    transform: none;
+  }
+
+  /* Luxury landing / series cards */
+  .lu-card-body {
+    padding: 22px 22px 26px;
+    gap: 10px;
+  }
+
+  .lu-card-name {
+    font-size: 1.1rem;
+  }
+
+  .lu-card-desc {
+    font-size: 0.85rem;
+  }
+
+  /* Content / stat cards */
+  .content-card {
+    padding: 20px;
+  }
+
+  .stat-card {
+    padding: 22px;
+    min-height: 140px;
+  }
+
+  .stat-value {
+    font-size: clamp(2rem, 8vw, 2.6rem);
+  }
+}
+
+/* Very small phones */
+@media (max-width: 480px) {
+  .product-card-body {
+    padding: 16px;
+  }
+
+  .lu-card-body {
+    padding: 18px 20px 22px;
+  }
+
+  .product-card h3 {
+    font-size: 1rem;
+  }
+
+  .lu-card-name {
+    font-size: 1rem;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   SITE-WIDE MOBILE POLISH
+══════════════════════════════════════════════ */
+
+/* Tablet (≤1024px) */
+@media (max-width: 1024px) {
+  .lu-section {
+    padding: 100px 0;
+  }
+
+  .lu-section-header {
+    margin-bottom: 56px;
+  }
+
+  .lu-account-page {
+    padding: 120px 0 80px;
+  }
+
+  .lu-account-section {
+    padding: 32px;
+  }
+}
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+  .lu-section {
+    padding: 72px 0;
+  }
+
+  .lu-section-header {
+    margin-bottom: 40px;
+  }
+
+  .lu-section-sub {
+    font-size: 0.92rem;
+    padding: 0 16px;
+  }
+
+  .lu-hero {
+    padding-top: 96px;
+  }
+
+  .lu-hero-inner {
+    gap: 0;
+    padding: 0 20px;
+  }
+
+  .lu-hero-headline {
+    margin-bottom: 24px;
+  }
+
+  .lu-hero-sub {
+    margin-bottom: 32px;
+  }
+
+  .lu-hero-tagline {
+    margin-top: 40px;
+    letter-spacing: 3px;
+  }
+
+  /* Account page */
+  .lu-account-page {
+    padding: 96px 0 64px;
+  }
+
+  .lu-account-grid {
+    gap: 24px;
+  }
+
+  .lu-account-section {
+    padding: 24px;
+  }
+
+  .lu-account-section-title {
+    margin-bottom: 24px;
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+  }
+
+  .lu-profile-card {
+    padding: 24px;
+  }
+
+  .lu-profile-avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 1.5rem;
+    margin-bottom: 14px;
+  }
+
+  /* Order cards stack */
+  .lu-order-product {
+    grid-template-columns: 48px 1fr;
+    grid-template-rows: auto auto;
+    gap: 12px 16px;
+  }
+
+  .lu-order-product-total {
+    grid-column: 1 / -1;
+    text-align: right;
+    font-size: 0.9rem;
+  }
+
+  .lu-order-head,
+  .lu-order-foot {
+    padding: 16px 18px;
+  }
+
+  .lu-order-body {
+    padding: 18px;
+  }
+
+  /* Auth card */
+  .lu-auth-page {
+    padding: 120px 16px 64px;
+  }
+
+  .lu-auth-card {
+    padding: 40px 24px;
+  }
+
+  /* Luxury buttons — full-width friendly on mobile */
+  .lu-btn-primary,
+  .lu-btn-ghost {
+    padding: 14px 28px;
+    font-size: 0.74rem;
+    letter-spacing: 2.5px;
+  }
+
+  /* Cart layout */
+  .cart-layout {
+    gap: 16px;
+  }
+
+  .cart-list,
+  .checkout-panel {
+    padding: 18px;
+  }
+
+  /* Stat card values */
+  .stat-value {
+    font-size: 2.2rem;
+  }
+
+  /* Big footer mark */
+  .aerion-footer-grid + div[aria-hidden="true"],
+  footer div[aria-hidden="true"] {
+    font-size: clamp(4rem, 20vw, 8rem) !important;
+  }
+
+  /* Trust strip: stack icon + text more tightly */
+  footer .trust-strip-icon {
+    flex-shrink: 0;
+  }
+}
+
+/* Small phones (≤480px) */
+@media (max-width: 480px) {
+  .lu-section {
+    padding: 56px 0;
+  }
+
+  .lu-section-header {
+    margin-bottom: 32px;
+  }
+
+  .lu-hero {
+    padding-top: 80px;
+    min-height: calc(100vh - 64px);
+  }
+
+  .lu-hero-headline {
+    letter-spacing: -0.035em;
+  }
+
+  .lu-hero-sub {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .lu-auth-card {
+    padding: 32px 20px;
+  }
+
+  .lu-account-section {
+    padding: 18px;
+  }
+
+  .lu-account-section-title {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Section titles can still get aggressive — cap at this width */
+  .lu-section-title {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+    letter-spacing: -0.02em;
+  }
+
+  .lu-philosophy-text {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .lu-cta-headline {
+    font-size: clamp(2rem, 10vw, 3rem);
   }
 }

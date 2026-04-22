@@ -18,45 +18,45 @@ import {
 const YEAR = new Date().getFullYear();
 
 const SHOP_LINKS = [
-  { label: 'Flight Series',    to: '/series' },
-  { label: 'Flight-15 Pro',    to: '/product/fl-15' },
-  { label: 'Flight-10 Club',   to: '/product/fl-10' },
-  { label: 'Flight-05 Train',  to: '/product/fl-05' },
+  { label: 'Flight Series', to: '/series' },
+  { label: 'Flight-15 Pro', to: '/product/fl-15' },
+  { label: 'Flight-10 Club', to: '/product/fl-10' },
+  { label: 'Flight-05 Train', to: '/product/fl-05' },
 ];
 
 const COMPANY_LINKS = [
-  { label: 'About Aerion',  to: '/about' },
-  { label: 'Engineering',   to: '/about' },
+  { label: 'About Aerion', to: '/about' },
+  { label: 'Engineering', to: '/about' },
   { label: 'Press & Media', to: '/contact' },
-  { label: 'Sponsorships',  to: '/contact' },
+  { label: 'Sponsorships', to: '/contact' },
 ];
 
 const SUPPORT_LINKS = [
-  { label: 'Contact',         to: '/contact' },
-  { label: 'My Account',      to: '/account' },
-  { label: 'Track Order',     to: '/orders' },
+  { label: 'Contact', to: '/contact' },
+  { label: 'My Account', to: '/account' },
+  { label: 'Track Order', to: '/orders' },
   { label: 'Shipping Policy', to: '/shipping-policy' },
-  { label: 'Refund Policy',   to: '/refund-policy' },
+  { label: 'Refund Policy', to: '/refund-policy' },
 ];
 
 const LEGAL_LINKS = [
   { label: 'Privacy', to: '/privacy' },
-  { label: 'Terms',   to: '/terms' },
+  { label: 'Terms', to: '/terms' },
   { label: 'Refunds', to: '/refund-policy' },
 ];
 
 const SOCIALS = [
   { label: 'Instagram', icon: Instagram, href: 'https://instagram.com/aerionsports' },
-  { label: 'YouTube',   icon: Youtube,   href: 'https://youtube.com/@aerionsports' },
-  { label: 'Twitter',   icon: Twitter,   href: 'https://twitter.com/aerionsports' },
-  { label: 'Facebook',  icon: Facebook,  href: 'https://facebook.com/aerionsports' },
+  { label: 'YouTube', icon: Youtube, href: 'https://youtube.com/@aerionsports' },
+  { label: 'Twitter', icon: Twitter, href: 'https://twitter.com/aerionsports' },
+  { label: 'Facebook', icon: Facebook, href: 'https://facebook.com/aerionsports' },
 ];
 
 const TRUST = [
-  { icon: ShieldCheck, title: 'Secure Checkout',  sub: 'SSL + Razorpay vault' },
-  { icon: Truck,       title: 'Free Shipping',    sub: 'On orders above INR 2,000' },
-  { icon: RotateCcw,   title: '7-Day Returns',    sub: 'No questions asked' },
-  { icon: Award,       title: 'Tournament Grade', sub: 'BWF-spec calibration' },
+  { icon: ShieldCheck, title: 'Secure Checkout', sub: 'SSL + Razorpay vault' },
+  { icon: Truck, title: 'Free Shipping', sub: 'On orders above INR 2,000' },
+  { icon: RotateCcw, title: '7-Day Returns', sub: 'No questions asked' },
+  { icon: Award, title: 'Tournament Grade', sub: 'BWF-spec calibration' },
 ];
 
 const S = {
@@ -78,7 +78,7 @@ const S = {
     marginBottom: '64px',
     borderBottom: '1px solid rgba(255,255,255,0.06)',
   },
-  trustItem: { display: 'flex', gap: '16px', alignItems: 'center' },
+  trustItem: { display: 'flex', gap: '16px', alignItems: 'center', minWidth: 0 },
   trustIcon: {
     width: '44px', height: '44px', flexShrink: 0,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -86,8 +86,9 @@ const S = {
     border: '1px solid rgba(201,168,76,0.25)',
     color: '#c9a84c',
   },
-  trustTitle: { fontSize: '0.82rem', fontWeight: 700, color: '#f0ede8', letterSpacing: '0.02em', marginBottom: '4px' },
-  trustSub: { fontSize: '0.72rem', opacity: 0.55, letterSpacing: '0.04em' },
+  trustText: { display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, lineHeight: 1.3 },
+  trustTitle: { fontSize: '0.82rem', fontWeight: 700, color: '#f0ede8', letterSpacing: '0.02em', marginBottom: '4px', lineHeight: 1.2 },
+  trustSub: { fontSize: '0.72rem', opacity: 0.55, letterSpacing: '0.04em', lineHeight: 1.3 },
   grid: {
     display: 'grid',
     gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1.5fr',
@@ -169,7 +170,7 @@ export default function Footer() {
     setTimeout(() => setStatus('idle'), 4000);
   };
 
-  const hoverIn  = (e) => { e.currentTarget.style.color = '#c9a84c'; e.currentTarget.style.transform = 'translateX(4px)'; };
+  const hoverIn = (e) => { e.currentTarget.style.color = '#c9a84c'; e.currentTarget.style.transform = 'translateX(4px)'; };
   const hoverOut = (e) => { e.currentTarget.style.color = 'rgba(240,237,232,0.65)'; e.currentTarget.style.transform = 'translateX(0)'; };
 
   return (
@@ -181,7 +182,7 @@ export default function Footer() {
             return (
               <div key={t.title} style={S.trustItem}>
                 <div style={S.trustIcon}><Icon size={18} /></div>
-                <div>
+                <div style={S.trustText}>
                   <div style={S.trustTitle}>{t.title}</div>
                   <div style={S.trustSub}>{t.sub}</div>
                 </div>
@@ -204,7 +205,7 @@ export default function Footer() {
             <div style={S.contactRow}><MapPin size={14} style={S.contactIcon} /><span>Sector 92, Gurgaon, India</span></div>
           </div>
 
-          <div>
+          <div className="aerion-footer-linkcol">
             <div style={S.colHeading}>Shop</div>
             <div style={S.colLinks}>
               {SHOP_LINKS.map((l) => (
@@ -213,7 +214,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
+          <div className="aerion-footer-linkcol">
             <div style={S.colHeading}>Company</div>
             <div style={S.colLinks}>
               {COMPANY_LINKS.map((l) => (
@@ -222,7 +223,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
+          <div className="aerion-footer-linkcol">
             <div style={S.colHeading}>Support</div>
             <div style={S.colLinks}>
               {SUPPORT_LINKS.map((l) => (
@@ -251,7 +252,7 @@ export default function Footer() {
               ...S.newsletterNote,
               color: status === 'ok' ? '#4ade80' : status === 'err' ? '#ff6b6b' : 'rgba(240,237,232,0.5)'
             }}>
-              {status === 'ok'  && 'Welcome to the Dispatch. Check your inbox.'}
+              {status === 'ok' && 'Welcome to the Dispatch. Check your inbox.'}
               {status === 'err' && 'Please enter a valid email address.'}
               {status === 'idle' && 'By joining you agree to our privacy policy.'}
             </div>
@@ -291,7 +292,27 @@ export default function Footer() {
           .aerion-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 40px !important; }
         }
         @media (max-width: 640px) {
-          .aerion-footer-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+          .aerion-footer-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 28px 20px !important;
+          }
+          .aerion-footer-grid > *:first-child,
+          .aerion-footer-grid > *:last-child {
+            grid-column: 1 / -1;
+          }
+          .aerion-footer-linkcol .col-heading,
+          .aerion-footer-linkcol > div:first-child {
+            font-size: 0.62rem !important;
+            letter-spacing: 0.22em !important;
+            margin-bottom: 16px !important;
+          }
+          .aerion-footer-linkcol a {
+            font-size: 0.8rem !important;
+          }
+        }
+        @media (max-width: 380px) {
+          .aerion-footer-grid { gap: 24px 14px !important; }
+          .aerion-footer-linkcol a { font-size: 0.75rem !important; }
         }
       `}</style>
     </footer>

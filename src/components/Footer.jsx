@@ -201,7 +201,7 @@ export default function Footer() {
               game in millimetres.
             </p>
             <div style={S.contactRow}><Mail size={14} style={S.contactIcon} /><span>aerionsports@gmail.com</span></div>
-            <div style={S.contactRow}><Phone size={14} style={S.contactIcon} /><span>+91 99112 25445</span></div>
+            <div style={S.contactRow}><Phone size={14} style={S.contactIcon} /><span>+91 99xxxxxx45</span></div>
             <div style={S.contactRow}><MapPin size={14} style={S.contactIcon} /><span>Sector 92, Gurgaon, India</span></div>
           </div>
 

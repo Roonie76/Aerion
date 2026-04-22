@@ -66,7 +66,7 @@ export default function Contact() {
     <section className="lu-section" style={{ minHeight: '100vh' }}>
       <Seo
         title="Contact"
-        description="Get in touch with Aerion for procurement, partnerships, or product queries. Email aerionsports@gmail.com or call +91 99112 25445."
+        description="Get in touch with Aerion for procurement, partnerships, or product queries. Email aerionsports@gmail.com or call +91 99xxxxxx45."
       />
       <div className="lu-container">
         <div className="lu-section-header">
@@ -94,7 +94,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.5, marginBottom: '4px' }}>Call Us</p>
-                  <p style={{ fontWeight: 700, color: 'var(--text)' }}>+91 99112 25445</p>
+                  <p style={{ fontWeight: 700, color: 'var(--text)' }}>+91 99xxxxxx45</p>
                 </div>
               </div>
 

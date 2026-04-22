@@ -12,7 +12,7 @@ export default function Terms() {
       <h2>1. About us</h2>
       <p>
         Aerion Sports is operated from Sector 92, Gurgaon, India. Contact:
-        <a href="mailto:aerionsports@gmail.com"> aerionsports@gmail.com</a>, +91 99112 25445.
+        <a href="mailto:aerionsports@gmail.com"> aerionsports@gmail.com</a>, +91 99xxxxxx45.
       </p>
 
       <h2>2. Eligibility</h2>

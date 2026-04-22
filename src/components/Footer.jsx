@@ -86,7 +86,7 @@ const S = {
     border: '1px solid rgba(201,168,76,0.25)',
     color: '#c9a84c',
   },
-  trustText: { display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, lineHeight: 1.3 },
+  trustText: { display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, lineHeight: 1.3, textAlign: 'left', alignItems: 'flex-start' },
   trustTitle: { fontSize: '0.82rem', fontWeight: 700, color: '#f0ede8', letterSpacing: '0.02em', marginBottom: '4px', lineHeight: 1.2 },
   trustSub: { fontSize: '0.72rem', opacity: 0.55, letterSpacing: '0.04em', lineHeight: 1.3 },
   grid: {

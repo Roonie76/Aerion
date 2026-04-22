@@ -62,7 +62,7 @@ export default function ShippingPolicy() {
       <h2>8. Contact</h2>
       <p>
         Email: <a href="mailto:aerionsports@gmail.com">aerionsports@gmail.com</a><br />
-        Phone: +91 99112 25445 (Mon–Sat, 10:00–19:00 IST)
+        Phone: +91 99xxxxxx45 (Mon–Sat, 10:00–19:00 IST)
       </p>
     </LegalPage>
   );
